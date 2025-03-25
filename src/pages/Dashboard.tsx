@@ -108,14 +108,14 @@ const Dashboard: React.FC = () => {
         <h2 className="text-lg font-medium text-gray-900 mb-4">Quick Links</h2>
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            { name: 'Add New Farmer', href: '/farmers/add', color: 'bg-green-50 text-green-700' },
-            { name: 'New Data Entry', href: '/data-collection/new', color: 'bg-blue-50 text-blue-700' },
-            { name: 'Schedule Training', href: '/training/schedule', color: 'bg-purple-50 text-purple-700' },
-            { name: 'Market Connections', href: '/market', color: 'bg-orange-50 text-orange-700' },
+            { name: 'Add New Farmer', to: '/create-farmer-form', color: 'bg-green-50 text-green-700' },
+            { name: 'New Data Entry', to: '/data-collection/new', color: 'bg-blue-50 text-blue-700' },
+            { name: 'Schedule Training', to: '/training/schedule', color: 'bg-purple-50 text-purple-700' },
+            { name: 'Market Connections', to: '/market', color: 'bg-orange-50 text-orange-700' },
           ].map((link, index) => (
             <a
               key={index}
-              href={link.href}
+              href={link.to}
               className={cn(
                 "group rounded-lg px-6 py-5 font-medium",
                 link.color,

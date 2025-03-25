@@ -3,6 +3,7 @@ import { Plus, Minus, MapPin, Camera } from 'lucide-react';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
 import { format } from 'date-fns';
+import axios from 'axios';
 
 interface Child {
   name: string;
@@ -14,7 +15,7 @@ interface Land {
   size: number;
   latitude: number;
   longitude: number;
-  ownership: 'Owned' | 'Rented' | 'Shared';
+  ownership: 'Owned' | 'Rented' | 'Borrowed' | 'Other';
   crops: string[];
   nearby: string[];
   image?: string;
@@ -162,6 +163,12 @@ const AddFarmerForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('You must be logged in to register a farmer');
+      return
+    }
     
     // Remove partner if not needed
     const submitData = {
@@ -170,9 +177,24 @@ const AddFarmerForm: React.FC = () => {
     };
 
     try {
-      console.log('Submitting farmer data:', submitData);
-      // Here you would typically make an API call to save the data
-      alert('Farmer registration successful!');
+      const response = await axios.post(
+        'http://localhost:5000/farmer/create-farmer',
+        submitData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+  
+      alert('Farmer registered successfully!');
+      console.log('Response:', response.data);
+  
+      // Optionally, clear the form
+      setFormData(initialFormData);
+      setHasPartner(false);
+
     } catch (error) {
       console.error('Error submitting farmer data:', error);
       alert('Error registering farmer. Please try again.');

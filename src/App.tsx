@@ -6,6 +6,8 @@ import Profile from './pages/Profile';
 import Farmers from './pages/Farmers';
 import Settings from './pages/Settings';
 import MainLayout from './components/layout/MainLayout';
+import AddFarmerForm from './components/farmers/AddFarmerForm';
+import FarmerDetails from './pages/FarmerDetails';
 
 function App() {
   return (
@@ -20,6 +22,9 @@ function App() {
           <Route path="/farmers" element={<Farmers />} />
           <Route path="/settings" element={<Settings />} />
           
+          <Route path='/create-farmer-form' element={<AddFarmerForm />} />
+          <Route path="/farmer-details/:id" element={<FarmerDetails />} />
+
           {/* Placeholder routes for future implementation */}
           <Route path="/data-collection" element={<ComingSoon title="Data Collection" />} />
           <Route path="/analytics" element={<ComingSoon title="Analytics" />} />
