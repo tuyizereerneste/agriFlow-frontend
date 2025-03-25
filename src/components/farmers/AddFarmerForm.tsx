@@ -178,7 +178,7 @@ const AddFarmerForm: React.FC = () => {
 
     try {
       const response = await axios.post(
-        'http://localhost:5000/farmer/create-farmer',
+        'https://agriflow-backend-cw6m.onrender.com/farmer/create-farmer',
         submitData,
         {
           headers: {

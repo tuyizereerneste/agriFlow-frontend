@@ -64,7 +64,7 @@ const FarmerDetails: React.FC = () => {
 
       try {
         const response = await axios.get<Farmer>(
-          `http://localhost:5000/farmer/get-farmer/${id}`,
+          `https://agriflow-backend-cw6m.onrender.com/farmer/get-farmer/${id}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setFarmer(response.data);
@@ -83,7 +83,7 @@ const FarmerDetails: React.FC = () => {
     if (!token || !farmer) return;
 
     try {
-      await axios.delete(`http://localhost:5000/farmer/delete-farmer/${id}`, {
+      await axios.delete(`https://agriflow-backend-cw6m.onrender.com/farmer/delete-farmer/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       navigate("/farmers");
