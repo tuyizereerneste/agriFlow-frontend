@@ -6,22 +6,57 @@ import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 import AddFarmerForm from "../components/farmers/AddFarmerForm";
 
-interface Farmer {
+interface Partner {
   id: string;
-  names: string;
+  name: string;
+  phones: string[];
+  dob: string;
+  gender: string;
+}
+
+interface Child {
+  id: string;
+  name: string;
+  dob: string;
+  gender: string;
+}
+
+interface Location {
   province: string;
   district: string;
   sector: string;
   cell: string;
   village: string;
+  latitude?: number;
+  longitude?: number;
+}
+
+interface Land {
+  id: string;
+  size: number;
+  ownership: string;
+  crops: string[];
+  image: string;
+  nearby: string[];
+  locations: {
+    location: Location;
+  }[];
+}
+
+interface Farmer {
+  id: string;
+  names: string;
   phones: string[];
   dob: string;
   gender: string;
-  ownership?: string;
-  crops?: string[];
-  nearby?: string;
-  size?: string;
+  createdAt: string;
+  farmerNumber: string;
+  location: Location;
+  partner?: Partner;
+  children?: Child[];
+  lands?: Land[];
 }
+
 
 const Farmers: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -59,7 +94,7 @@ const Farmers: React.FC = () => {
         params: {
           query: searchTerm || undefined,
           ownership: filters.ownership || undefined,
-          crops: filters.crops.trim() || undefined, // Fix: Ensure crops filter is correctly formatted
+          crops: filters.crops.trim() || undefined,
           nearby: filters.nearby || undefined,
           minSize: filters.size || undefined,
         },
@@ -78,7 +113,7 @@ const Farmers: React.FC = () => {
     try {
       const response = await axios.get("https://agriflow-backend-cw6m.onrender.com/farmers/export-excel", {
         headers: { Authorization: `Bearer ${token}` },
-        responseType: "blob", // Ensure response is treated as a file
+        responseType: "blob",
       });
 
       const url = window.URL.createObjectURL(new Blob([response.data as Blob]));
@@ -191,7 +226,14 @@ const Farmers: React.FC = () => {
                   <Link to={`/farmer-details/${farmer.id}`} className="block p-4 hover:bg-gray-50 flex items-center">
                     <div className="flex-1">
                       <p className="text-lg font-medium">{farmer.names}</p>
-                      <p className="text-sm text-gray-500">{farmer.province}, {farmer.district}</p>
+                      <p className="text-sm text-gray-500">
+                        <strong>Farmer Number:</strong> {farmer.farmerNumber}
+                      </p>
+                      {farmer.location && (
+                        <p className="text-sm text-gray-500">
+                          <strong>Location:</strong> {farmer.location.province}, {farmer.location.district}
+                        </p>
+                      )}
                       <p className="text-sm text-gray-500"><Phone size={14} className="inline-block mr-1" /> {farmer.phones[0]}</p>
                     </div>
                     <MapPin size={20} className="text-gray-400" />

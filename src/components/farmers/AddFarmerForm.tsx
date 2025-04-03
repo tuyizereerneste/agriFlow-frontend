@@ -11,27 +11,38 @@ interface Child {
   gender: 'Male' | 'Female';
 }
 
-interface Land {
-  size: number;
+interface LandLocation {
+  province: string;
+  district: string;
+  sector: string;
+  cell: string;
+  village: string;
   latitude: number;
   longitude: number;
+}
+
+interface Land {
+  size: number;
   ownership: 'Owned' | 'Rented' | 'Borrowed' | 'Other';
   crops: string[];
   nearby: string[];
+  location: LandLocation;
   image?: string;
 }
 
 interface FarmerFormData {
   farmer: {
     names: string;
+    phones: string[];
+    dob: string;
+    gender: 'Male' | 'Female';
+  };
+  location: {
     province: string;
     district: string;
     sector: string;
     cell: string;
     village: string;
-    phones: string[];
-    dob: string;
-    gender: 'Male' | 'Female';
   };
   partner?: {
     name: string;
@@ -46,14 +57,16 @@ interface FarmerFormData {
 const initialFormData: FarmerFormData = {
   farmer: {
     names: '',
+    phones: [''],
+    dob: '',
+    gender: 'Male',
+  },
+  location: {
     province: '',
     district: '',
     sector: '',
     cell: '',
     village: '',
-    phones: [''],
-    dob: '',
-    gender: 'Male',
   },
   children: [],
   lands: [],
@@ -69,6 +82,17 @@ const AddFarmerForm: React.FC = () => {
       ...prev,
       farmer: {
         ...prev.farmer,
+        [name]: value,
+      },
+    }));
+  };
+
+  const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      location: {
+        ...prev.location,
         [name]: value,
       },
     }));
@@ -105,7 +129,7 @@ const AddFarmerForm: React.FC = () => {
   const handleChildChange = (index: number, field: keyof Child, value: string) => {
     setFormData(prev => ({
       ...prev,
-      children: prev.children.map((child, i) => 
+      children: prev.children.map((child, i) =>
         i === index ? { ...child, [field]: value } : child
       ),
     }));
@@ -118,11 +142,18 @@ const AddFarmerForm: React.FC = () => {
         ...prev.lands,
         {
           size: 0,
-          latitude: 0,
-          longitude: 0,
           ownership: 'Owned',
           crops: [],
           nearby: [],
+          location: {
+            province: '',
+            district: '',
+            sector: '',
+            cell: '',
+            village: '',
+            latitude: 0,
+            longitude: 0,
+          },
         },
       ],
     }));
@@ -138,8 +169,17 @@ const AddFarmerForm: React.FC = () => {
   const handleLandChange = (index: number, field: keyof Land, value: any) => {
     setFormData(prev => ({
       ...prev,
-      lands: prev.lands.map((land, i) => 
+      lands: prev.lands.map((land, i) =>
         i === index ? { ...land, [field]: value } : land
+      ),
+    }));
+  };
+
+  const handleLandLocationChange = (index: number, field: keyof LandLocation, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      lands: prev.lands.map((land, i) =>
+        i === index ? { ...land, location: { ...land.location, [field]: value } } : land
       ),
     }));
   };
@@ -150,9 +190,9 @@ const AddFarmerForm: React.FC = () => {
         const position = await new Promise<GeolocationPosition>((resolve, reject) => {
           navigator.geolocation.getCurrentPosition(resolve, reject);
         });
-        
-        handleLandChange(landIndex, 'latitude', position.coords.latitude);
-        handleLandChange(landIndex, 'longitude', position.coords.longitude);
+
+        handleLandLocationChange(landIndex, 'latitude', position.coords.latitude);
+        handleLandLocationChange(landIndex, 'longitude', position.coords.longitude);
       } catch (error) {
         alert('Error getting location. Please try again.');
       }
@@ -167,9 +207,9 @@ const AddFarmerForm: React.FC = () => {
     const token = localStorage.getItem('token');
     if (!token) {
       alert('You must be logged in to register a farmer');
-      return
+      return;
     }
-    
+
     // Remove partner if not needed
     const submitData = {
       ...formData,
@@ -187,10 +227,10 @@ const AddFarmerForm: React.FC = () => {
           },
         }
       );
-  
+
       alert('Farmer registered successfully!');
       console.log('Response:', response.data);
-  
+
       // Optionally, clear the form
       setFormData(initialFormData);
       setHasPartner(false);
@@ -254,36 +294,36 @@ const AddFarmerForm: React.FC = () => {
           <Input
             label="Province"
             name="province"
-            value={formData.farmer.province}
-            onChange={handleFarmerChange}
+            value={formData.location.province}
+            onChange={handleLocationChange}
             required
           />
           <Input
             label="District"
             name="district"
-            value={formData.farmer.district}
-            onChange={handleFarmerChange}
+            value={formData.location.district}
+            onChange={handleLocationChange}
             required
           />
           <Input
             label="Sector"
             name="sector"
-            value={formData.farmer.sector}
-            onChange={handleFarmerChange}
+            value={formData.location.sector}
+            onChange={handleLocationChange}
             required
           />
           <Input
             label="Cell"
             name="cell"
-            value={formData.farmer.cell}
-            onChange={handleFarmerChange}
+            value={formData.location.cell}
+            onChange={handleLocationChange}
             required
           />
           <Input
             label="Village"
             name="village"
-            value={formData.farmer.village}
-            onChange={handleFarmerChange}
+            value={formData.location.village}
+            onChange={handleLocationChange}
             required
           />
         </div>
@@ -318,7 +358,7 @@ const AddFarmerForm: React.FC = () => {
             <span className="ml-2 text-sm text-gray-600">Has partner</span>
           </label>
         </div>
-        
+
         {hasPartner && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
@@ -383,7 +423,7 @@ const AddFarmerForm: React.FC = () => {
             Add Child
           </Button>
         </div>
-        
+
         {formData.children.map((child, index) => (
           <div key={index} className="mb-4 p-4 border border-gray-200 rounded-md">
             <div className="flex justify-between items-start mb-4">
@@ -446,7 +486,7 @@ const AddFarmerForm: React.FC = () => {
             Add Land
           </Button>
         </div>
-        
+
         {formData.lands.map((land, index) => (
           <div key={index} className="mb-4 p-4 border border-gray-200 rounded-md">
             <div className="flex justify-between items-start mb-4">
@@ -485,26 +525,57 @@ const AddFarmerForm: React.FC = () => {
                 </select>
               </div>
               <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="relative">
-                  <Input
-                    label="Latitude"
-                    type="number"
-                    step="any"
-                    value={land.latitude}
-                    onChange={(e) => handleLandChange(index, 'latitude', Number(e.target.value))}
-                    required
-                  />
-                </div>
-                <div className="relative">
-                  <Input
-                    label="Longitude"
-                    type="number"
-                    step="any"
-                    value={land.longitude}
-                    onChange={(e) => handleLandChange(index, 'longitude', Number(e.target.value))}
-                    required
-                  />
-                </div>
+                <Input
+                  label="Province"
+                  type="text"
+                  value={land.location.province}
+                  onChange={(e) => handleLandLocationChange(index, 'province', e.target.value)}
+                  required
+                />
+                <Input
+                  label="District"
+                  type="text"
+                  value={land.location.district}
+                  onChange={(e) => handleLandLocationChange(index, 'district', e.target.value)}
+                  required
+                />
+                <Input
+                  label="Sector"
+                  type="text"
+                  value={land.location.sector}
+                  onChange={(e) => handleLandLocationChange(index, 'sector', e.target.value)}
+                  required
+                />
+                <Input
+                  label="Cell"
+                  type="text"
+                  value={land.location.cell}
+                  onChange={(e) => handleLandLocationChange(index, 'cell', e.target.value)}
+                  required
+                />
+                <Input
+                  label="Village"
+                  type="text"
+                  value={land.location.village}
+                  onChange={(e) => handleLandLocationChange(index, 'village', e.target.value)}
+                  required
+                />
+                <Input
+                  label="Latitude"
+                  type="number"
+                  step="any"
+                  value={land.location.latitude}
+                  onChange={(e) => handleLandLocationChange(index, 'latitude', Number(e.target.value))}
+                  required
+                />
+                <Input
+                  label="Longitude"
+                  type="number"
+                  step="any"
+                  value={land.location.longitude}
+                  onChange={(e) => handleLandLocationChange(index, 'longitude', Number(e.target.value))}
+                  required
+                />
                 <div className="md:col-span-2">
                   <Button
                     type="button"
@@ -531,7 +602,7 @@ const AddFarmerForm: React.FC = () => {
                 placeholder="e.g., Lake, Forest, Road"
                 required
               />
-              <div className="md:col-span-2">
+              {/*<div className="md:col-span-2"> 
                 <Input
                   label="Land Image URL"
                   type="url"
@@ -539,7 +610,7 @@ const AddFarmerForm: React.FC = () => {
                   onChange={(e) => handleLandChange(index, 'image', e.target.value)}
                   placeholder="https://example.com/land-image.jpg"
                 />
-              </div>
+              </div> */}
             </div>
           </div>
         ))}
