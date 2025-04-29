@@ -59,9 +59,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
     { name: 'Voluteer Management', href: '/volunteer-management', icon: <FileText size={20} /> },
     { name: 'Analytics', href: '/analytics', icon: <BarChart3 size={20} /> },
     { name: 'Project Management', href: '/projects', icon: <BookOpen size={20} /> },
-    { name: 'Market Connections', href: '/market', icon: <ShoppingBag size={20} /> },
-    { name: 'Partners', href: '/partners', icon: <Building size={20} /> },
-    { name: 'Calendar', href: '/calendar', icon: <Calendar size={20} /> },
+    { name: 'Partners', href: '/companies', icon: <Building size={20} /> },
+    // { name: 'Calendar', href: '/calendar', icon: <Calendar size={20} /> },
   ];
   
   const secondaryNavigation = [

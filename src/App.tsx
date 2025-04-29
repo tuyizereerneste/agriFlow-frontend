@@ -15,6 +15,8 @@ import ProjectFarmerDetails from './components/projects/ProjectFarmerDetails';
 import FarmerToProject from './components/ProjectEnrollment/testSearch';
 
 import { AddFarmerModal } from './components/ProjectEnrollment/AddFarmerModal';
+import CompanyManagement from './components/companyDashboard/CompanyManagement';
+import VolunteerManagement from './components/VolunteerDashboard/VolunteerManagement';
 
 function App() {
   return (
@@ -39,7 +41,11 @@ function App() {
           <Route path="/projects/:projectId/farmer-enrollment" element={<AddFarmerModal projectId={''} projectTitle={''} onClose={() => { }} onSuccess={() => { }} />} />
           <Route path="/project/:projectId/farmer/:farmerId" element={<ProjectFarmerDetails />} />
         
-          <Route path="/test" element={<FarmerToProject />} />
+          {/* Companion routes */}
+          <Route path="/companies" element={<CompanyManagement />} />
+
+          {/* Volunteer routes */}
+          <Route path="/volunteer-management" element={<VolunteerManagement />} />
 
 
           <Route path="/data-collection" element={<ComingSoon title="Data Collection" />} />
