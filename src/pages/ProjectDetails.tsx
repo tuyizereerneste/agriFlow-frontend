@@ -100,7 +100,7 @@ const ProjectDetails: React.FC = () => {
       setError(null);
 
       try {
-        const response = await axios.get<{ message: string; data: ProjectDetails }>(`http://localhost:5000/project/get-project/${id}`, {
+        const response = await axios.get<{ message: string; data: ProjectDetails }>(`https://agriflow-backend-cw6m.onrender.com/project/get-project/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 

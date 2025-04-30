@@ -98,7 +98,7 @@ const EditCompanyModal: React.FC<EditCompanyModalProps> = ({ company, onClose, o
     }
 
     try {
-      await axios.put(`http://localhost:5000/company/update-company/${formData.id}`, formDataToSend, {
+      await axios.put(`https://agriflow-backend-cw6m.onrender.com/company/update-company/${formData.id}`, formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
