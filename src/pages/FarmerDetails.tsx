@@ -48,7 +48,7 @@ interface Farmer {
   gender: string;
   createdAt: string;
   farmerNumber: string;
-  location: Location;
+  location: Location[];
   partner?: Partner;
   children?: Child[];
   lands?: Land[];
@@ -118,6 +118,9 @@ const FarmerDetails: React.FC = () => {
   if (error) return <p className="text-red-500">{error}</p>;
   if (!farmer) return <p className="text-gray-500">Farmer not found.</p>;
 
+  // Extract the first location from the array
+  const location = farmer.location[0];
+
   return (
     <div className="flex flex-col items-center min-h-screen py-10">
       <div className="mb-6 flex items-center">
@@ -150,27 +153,27 @@ const FarmerDetails: React.FC = () => {
 
             <div className="form-field flex items-center space-x-4">
               <label className="text-gray-600 font-medium">Province:</label>
-              <p className="text-gray-800">{farmer.location.province}</p>
+              <p className="text-gray-800">{location.province}</p>
             </div>
 
             <div className="form-field flex items-center space-x-4">
               <label className="text-gray-600 font-medium">District:</label>
-              <p className="text-gray-800">{farmer.location.district}</p>
+              <p className="text-gray-800">{location.district}</p>
             </div>
 
             <div className="form-field flex items-center space-x-4">
               <label className="text-gray-600 font-medium">Sector:</label>
-              <p className="text-gray-800">{farmer.location.sector}</p>
+              <p className="text-gray-800">{location.sector}</p>
             </div>
 
             <div className="form-field flex items-center space-x-4">
               <label className="text-gray-600 font-medium">Cell:</label>
-              <p className="text-gray-800">{farmer.location.cell}</p>
+              <p className="text-gray-800">{location.cell}</p>
             </div>
 
             <div className="form-field flex items-center space-x-4">
               <label className="text-gray-600 font-medium">Village:</label>
-              <p className="text-gray-800">{farmer.location.village}</p>
+              <p className="text-gray-800">{location.village}</p>
             </div>
 
             <div className="form-field flex items-center space-x-4">

@@ -15,7 +15,7 @@ const stats = [
   { 
     id: 1, 
     name: 'Total Farmers', 
-    value: '2,543', 
+    value: '543', 
     change: '+12.3%', 
     trend: 'up',
     icon: <Users size={20} className="text-blue-500" />,
@@ -24,7 +24,7 @@ const stats = [
   { 
     id: 2, 
     name: 'Data Entries', 
-    value: '8,765', 
+    value: '1,765', 
     change: '+23.1%', 
     trend: 'up',
     icon: <FileText size={20} className="text-green-500" />,
@@ -33,7 +33,7 @@ const stats = [
   { 
     id: 3, 
     name: 'Training Sessions', 
-    value: '245', 
+    value: '24', 
     change: '+4.5%', 
     trend: 'up',
     icon: <Calendar size={20} className="text-purple-500" />,
@@ -42,7 +42,7 @@ const stats = [
   { 
     id: 4, 
     name: 'Market Connections', 
-    value: '156', 
+    value: '15', 
     change: '-2.3%', 
     trend: 'down',
     icon: <ShoppingBag size={20} className="text-orange-500" />,
