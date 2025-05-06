@@ -18,6 +18,16 @@ import { AddFarmerModal } from './components/ProjectEnrollment/AddFarmerModal';
 import CompanyManagement from './components/companyDashboard/CompanyManagement';
 import VolunteerManagement from './components/VolunteerDashboard/VolunteerManagement';
 
+import CompanyDashboardLayout from "./components/layout/CompanyDashboardLayout";
+import CompanyProjectDetails from "./components/company/ProjectDetails";
+import Analytics from "./components/company/Analytics";
+import Reports from "./components/company/Reports";
+import Notifications from "./components/company/Notifications";
+import CompanyOverview from './components/company/Overview';
+import CompanyActivities from './components/company/CompanyActivities';
+import CompanyReports from './components/company/CompanyReports';
+import CompanyAnalytics from './components/company/CompanyAnalytics';
+import CompanyProfile from './components/company/CompanyProfile';
 function App() {
   return (
     <Router>
@@ -58,6 +68,15 @@ function App() {
         </Route>
         
         <Route path="*" element={<Navigate to="/login" replace />} />
+        {/* Company Dashboard */}
+        <Route path="/company" element={<CompanyDashboardLayout />}>
+          <Route path="overview" element={<CompanyOverview />} />
+          <Route path="activities" element={<CompanyActivities />} />
+          <Route path="analytics" element={<CompanyAnalytics />} />
+          <Route path="reports" element={<CompanyReports />} />
+          <Route path="notifications" element={<Notifications />} />
+          <Route path="company-profile" element={<CompanyProfile />} />
+        </Route>
       </Routes>
     </Router>
   );

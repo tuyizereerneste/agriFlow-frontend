@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Phone } from 'lucide-react';
+import { Phone, Users } from 'lucide-react';
 import { AddFarmerModal } from '../components/ProjectEnrollment/AddFarmerModal';
+import { ActivityAttendance } from '../components/Attendance/ActivityAttendance';
 
 interface Activity {
   id: string;
@@ -65,11 +66,23 @@ interface Farmer {
   };
 }
 
+interface ProjectOwner {
+  id: string;
+  name: string;
+  email: string;
+  type: string;
+  company: {
+    id: string;
+    logo: string;
+    tin: string;
+  };
+}
+
 interface ProjectDetails {
   id: string;
   title: string;
   description: string;
-  owner: string;
+  owner: ProjectOwner;
   startDate: string;
   endDate: string;
   objectives: string;
@@ -84,6 +97,7 @@ const ProjectDetails: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [showAttendanceModal, setShowAttendanceModal] = useState(false);
   const navigate = useNavigate();
 
   const token = localStorage.getItem('token');
@@ -100,7 +114,7 @@ const ProjectDetails: React.FC = () => {
       setError(null);
 
       try {
-        const response = await axios.get<{ message: string; data: ProjectDetails }>(`https://agriflow-backend-cw6m.onrender.com/project/get-project/${id}`, {
+        const response = await axios.get<{ message: string; data: ProjectDetails }>(`http://localhost:5000/project/get-project/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -135,7 +149,7 @@ const ProjectDetails: React.FC = () => {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-4">{project.title}</h1>
-      <p className="text-gray-600 mb-2"><strong>Owner:</strong> {project.owner}</p>
+      <p className="text-gray-600 mb-2"><strong>Owner:</strong> {project.owner.name}</p>
       <p className="text-gray-600 mb-2"><strong>Start Date:</strong> {new Date(project.startDate).toLocaleDateString()}</p>
       <p className="text-gray-600 mb-2"><strong>End Date:</strong> {new Date(project.endDate).toLocaleDateString()}</p>
       <p className="text-gray-600 mb-4"><strong>Objectives:</strong> {project.objectives}</p>
@@ -189,9 +203,16 @@ const ProjectDetails: React.FC = () => {
         <div className="max-w-4xl mx-auto">
           <button
             onClick={() => setShowModal(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 mb-2"
           >
             Add Farmer to Project
+          </button>
+          <button
+            onClick={() => setShowAttendanceModal(true)}
+            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
+          >
+            <Users size={20} />
+            Record Attendance
           </button>
 
           {showModal && project && (
@@ -200,8 +221,18 @@ const ProjectDetails: React.FC = () => {
               projectTitle={project.title}
               onClose={() => setShowModal(false)}
               onSuccess={() => {
-                // Refresh project details or show success message
                 console.log('Farmer added successfully');
+              }}
+            />
+          )}
+          {showAttendanceModal && project && (
+            <ActivityAttendance
+              projectId={project.id}
+              projectTitle={project.title}
+              onClose={() => setShowAttendanceModal(false)}
+              onSuccess={(record) => {
+                console.log('Attendance recorded:', record);
+                setShowAttendanceModal(false);
               }}
             />
           )}
