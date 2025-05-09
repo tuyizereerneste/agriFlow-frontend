@@ -12,7 +12,6 @@ import ProjectsPage from './pages/ProjectsPage';
 import CreateProjectForm from './components/projects/createProjectForm';
 import ProjectDetails from './pages/ProjectDetails';
 import ProjectFarmerDetails from './components/projects/ProjectFarmerDetails';
-import FarmerToProject from './components/ProjectEnrollment/testSearch';
 
 import { AddFarmerModal } from './components/ProjectEnrollment/AddFarmerModal';
 import CompanyManagement from './components/companyDashboard/CompanyManagement';
@@ -21,7 +20,7 @@ import VolunteerManagement from './components/VolunteerDashboard/VolunteerManage
 import CompanyDashboardLayout from "./components/layout/CompanyDashboardLayout";
 import CompanyProjectDetails from "./components/company/ProjectDetails";
 import Analytics from "./components/company/Analytics";
-import Reports from "./components/company/Reports";
+import Reports from "./pages/Reports";
 import Notifications from "./components/company/Notifications";
 import CompanyOverview from './components/company/Overview';
 import CompanyActivities from './components/company/CompanyActivities';
@@ -56,6 +55,7 @@ function App() {
 
           {/* Volunteer routes */}
           <Route path="/volunteer-management" element={<VolunteerManagement />} />
+          <Route path="/reports" element={<Reports />} />
 
 
           <Route path="/data-collection" element={<ComingSoon title="Data Collection" />} />
@@ -73,7 +73,7 @@ function App() {
           <Route path="overview" element={<CompanyOverview />} />
           <Route path="activities" element={<CompanyActivities />} />
           <Route path="analytics" element={<CompanyAnalytics />} />
-          <Route path="reports" element={<CompanyReports />} />
+          <Route path="company-reports" element={<CompanyReports />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="company-profile" element={<CompanyProfile />} />
         </Route>

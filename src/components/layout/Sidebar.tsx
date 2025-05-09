@@ -58,6 +58,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
     { name: 'Farmers', href: '/farmers', icon: <Users size={20} /> },
     { name: 'Voluteer Management', href: '/volunteer-management', icon: <FileText size={20} /> },
     { name: 'Analytics', href: '/analytics', icon: <BarChart3 size={20} /> },
+    { name: 'Reports', href: '/reports', icon: <FileText size={20} /> },
     { name: 'Project Management', href: '/projects', icon: <BookOpen size={20} /> },
     { name: 'Partners', href: '/companies', icon: <Building size={20} /> },
     // { name: 'Calendar', href: '/calendar', icon: <Calendar size={20} /> },
