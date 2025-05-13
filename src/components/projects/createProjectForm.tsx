@@ -24,26 +24,23 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({ onSuccess }) => {
     startDate: '',
     endDate: '',
     objectives: '',
-    targetPractices: [
-      {
-        title: '',
-        initialSituation: '',
-        activities: [
-          {
-            title: '',
-            description: '',
-            startDate: '',
-            endDate: '',
-          },
-        ],
-      },
-    ],
+    targetPractices: [] as Array<{
+      title: string;
+      initialSituation: string;
+      activities: Array<{
+        title: string;
+        description: string;
+        startDate: string;
+        endDate: string;
+      }>;
+    }>,
   });
 
   const [companies, setCompanies] = useState<Company[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [showPractices, setShowPractices] = useState(false);
 
   useEffect(() => {
     fetchRegisteredCompanies();
@@ -52,7 +49,7 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({ onSuccess }) => {
   const fetchRegisteredCompanies = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get<{ data: Company[] }>(`https://agriflow-backend-cw6m.onrender.com/company/get-all-companies`, {
+      const response = await axios.get<{ data: Company[] }>(`http://localhost:5000/company/all`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -62,11 +59,11 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({ onSuccess }) => {
         setCompanies(response.data.data);
       } else {
         console.error('Unexpected data format:', response.data);
-        setCompanies([]); // Set to an empty array if the data format is unexpected
+        setCompanies([]);
       }
     } catch (error) {
       console.error('Error fetching registered companies:', error);
-      setCompanies([]); // Set to an empty array in case of an error
+      setCompanies([]);
     }
   };
 
@@ -152,7 +149,7 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({ onSuccess }) => {
       }
 
       const response = await axios.post<ProjectResponse>(
-        `https://agriflow-backend-cw6m.onrender.com/project/create-project`,
+        `http://localhost:5000/project/create-project`,
         formData,
         {
           headers: {
@@ -173,20 +170,7 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({ onSuccess }) => {
         startDate: '',
         endDate: '',
         objectives: '',
-        targetPractices: [
-          {
-            title: '',
-            initialSituation: '',
-            activities: [
-              {
-                title: '',
-                description: '',
-                startDate: '',
-                endDate: '',
-              },
-            ],
-          },
-        ],
+        targetPractices: [],
       });
 
       // Call the onSuccess callback
@@ -196,6 +180,20 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({ onSuccess }) => {
       setMessage({ type: 'error', text: error.response?.data?.message || 'An error occurred.' });
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleProjectDetailsSubmit = () => {
+    if (formData.title && formData.description && formData.userId && formData.startDate && formData.endDate) {
+      setShowPractices(true);
+    } else {
+      setErrors({
+        title: !formData.title ? 'Title is required' : '',
+        description: !formData.description ? 'Description is required' : '',
+        userId: !formData.userId ? 'User ID is required' : '',
+        startDate: !formData.startDate ? 'Start date is required' : '',
+        endDate: !formData.endDate ? 'End date is required' : '',
+      });
     }
   };
 
@@ -237,49 +235,61 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({ onSuccess }) => {
         <Input label="End Date" type="date" name="endDate" value={formData.endDate} onChange={(e) => handleChange(e, 'endDate')} error={errors.endDate} required />
         <Input label="Objectives" name="objectives" value={formData.objectives} onChange={(e) => handleChange(e, 'objectives')} />
 
-        {formData.targetPractices.map((practice, i) => (
-          <div key={i} className="border p-4 rounded-md space-y-4 bg-gray-50">
-            <div className="flex justify-between items-center">
-              <h4 className="text-lg font-medium">Practice {i + 1}</h4>
-              {formData.targetPractices.length > 1 && (
-                <button type="button" onClick={() => removePractice(i)} className="text-red-500">Remove
-                  <Trash size={16} />
-                </button>
-              )}
-            </div>
-            <Input label="Title" value={practice.title} onChange={(e) => handleChange(e, `targetPractices.${i}.title`)} required />
-            <Input label="Initial Situation" value={practice.initialSituation} onChange={(e) => handleChange(e, `targetPractices.${i}.initialSituation`)} />
+        <Button type="button" variant="outline" onClick={handleProjectDetailsSubmit} className="w-full">
+          Next: Add Practices
+        </Button>
 
-            {practice.activities.map((activity, j) => (
-              <div key={j} className="border border-gray-200 rounded-md p-3 bg-white space-y-2">
+        {showPractices && (
+          <>
+            {formData.targetPractices.map((practice, i) => (
+              <div key={i} className="border p-4 rounded-md space-y-4 bg-gray-50">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Activity {j + 1}</span>
-                  {practice.activities.length > 1 && (
-                    <button type="button" onClick={() => removeActivity(i, j)} className="text-red-400">Remove
-                      <Trash size={14}  />
+                  <h4 className="text-lg font-medium">Practice {i + 1}</h4>
+                  {formData.targetPractices.length > 1 && (
+                    <button type="button" onClick={() => removePractice(i)} className="text-red-500">
+                      Remove
+                      <Trash size={16} />
                     </button>
                   )}
                 </div>
-                <Input label="Activity Title" value={activity.title} onChange={(e) => handleChange(e, `targetPractices.${i}.activities.${j}.title`)} required />
-                <Input label="Description" value={activity.description} onChange={(e) => handleChange(e, `targetPractices.${i}.activities.${j}.description`)} />
-                <Input type="date" label="Start Date" value={activity.startDate} onChange={(e) => handleChange(e, `targetPractices.${i}.activities.${j}.startDate`)} required />
-                <Input type="date" label="End Date" value={activity.endDate} onChange={(e) => handleChange(e, `targetPractices.${i}.activities.${j}.endDate`)} required />
+                <Input label="Title" value={practice.title} onChange={(e) => handleChange(e, `targetPractices.${i}.title`)} required />
+                <Input label="Initial Situation" value={practice.initialSituation} onChange={(e) => handleChange(e, `targetPractices.${i}.initialSituation`)} />
+
+                {practice.activities.map((activity, j) => (
+                  <div key={j} className="border border-gray-200 rounded-md p-3 bg-white space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Activity {j + 1}</span>
+                      {practice.activities.length > 1 && (
+                        <button type="button" onClick={() => removeActivity(i, j)} className="text-red-400">
+                          Remove
+                          <Trash size={14} />
+                        </button>
+                      )}
+                    </div>
+                    <Input label="Activity Title" value={activity.title} onChange={(e) => handleChange(e, `targetPractices.${i}.activities.${j}.title`)} required />
+                    <Input label="Description" value={activity.description} onChange={(e) => handleChange(e, `targetPractices.${i}.activities.${j}.description`)} />
+                    <Input type="date" label="Start Date" value={activity.startDate} onChange={(e) => handleChange(e, `targetPractices.${i}.activities.${j}.startDate`)} required />
+                    <Input type="date" label="End Date" value={activity.endDate} onChange={(e) => handleChange(e, `targetPractices.${i}.activities.${j}.endDate`)} required />
+                  </div>
+                ))}
+
+                <Button type="button" variant="outline" onClick={() => addActivity(i)} className="w-full">
+                  <Plus size={16} className="mr-2" /> Add Activity
+                </Button>
               </div>
             ))}
 
-            <Button type="button" variant="outline" onClick={() => addActivity(i)} className="w-full">
-              <Plus size={16} className="mr-2" /> Add Activity
+            <Button type="button" variant="outline" onClick={addPractice} className="w-full">
+              <Plus size={16} className="mr-2" /> Add Practice
             </Button>
-          </div>
-        ))}
+          </>
+        )}
 
-        <Button type="button" variant="outline" onClick={addPractice} className="w-full">
-          <Plus size={16} className="mr-2" /> Add Practice
-        </Button>
-
-        <Button type="submit" variant="primary" size="lg" className="w-full" isLoading={isSubmitting}>
-          Create Project
-        </Button>
+        {showPractices && (
+          <Button type="submit" variant="primary" size="lg" className="w-full" isLoading={isSubmitting}>
+            Create Project
+          </Button>
+        )}
       </form>
     </div>
   );

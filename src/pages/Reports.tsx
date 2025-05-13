@@ -407,49 +407,52 @@ const exportPDF = () => {
       )}
 
       {/* 🧑‍🌾 Farmers List */}
-      {farmers.length > 0 && (
-          <div className="overflow-x-auto mt-6">
-            <h2 className="text-xl font-semibold mb-2">Registered Farmers</h2>
-            <table className="min-w-full border border-gray-300">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="border px-4 py-2 text-left">Farmer Number</th>
-                  <th className="border px-4 py-2 text-left">Name</th>
-                  <th className="border px-4 py-2 text-left">Gender</th>
-                  <th className="border px-4 py-2 text-left">Date of Birth</th>
-                  <th className="border px-4 py-2 text-left">Phone Numbers</th>
-                  <th className="border px-4 py-2 text-left">Province</th>
-                  <th className="border px-4 py-2 text-left">District</th>
-                  <th className="border px-4 py-2 text-left">Sector</th>
-                  <th className="border px-4 py-2 text-left">Cell</th>
-                  <th className="border px-4 py-2 text-left">Village</th>
-                </tr>
-              </thead>
-              <tbody>
-                {farmers.map((farmer) => {
-                  const location = farmer.location?.[0] ?? {};
-                  return (
-                    <tr key={farmer.id} className="hover:bg-gray-50">
-                      <td className="border px-4 py-2">{farmer.farmerNumber}</td>
-                      <td className="border px-4 py-2">{farmer.names}</td>
-                      <td className="border px-4 py-2">{farmer.gender}</td>
-                      <td className="border px-4 py-2">
-                        {new Date(farmer.dob).toLocaleDateString()}
-                      </td>
-                      <td className="border px-4 py-2">{farmer.phones.join(", ")}</td>
-                      <td className="border px-4 py-2">{location.province}</td>
-                      <td className="border px-4 py-2">{location.district}</td>
-                      <td className="border px-4 py-2">{location.sector}</td>
-                      <td className="border px-4 py-2">{location.cell}</td>
-                      <td className="border px-4 py-2">{location.village}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-
+      {farmers.length > 0 ? (
+            <div className="overflow-x-auto mt-6">
+              <h2 className="text-xl font-semibold mb-2">Registered Farmers</h2>
+              <table className="min-w-full border border-gray-300">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="border px-4 py-2 text-left">Farmer Number</th>
+                    <th className="border px-4 py-2 text-left">Name</th>
+                    <th className="border px-4 py-2 text-left">Gender</th>
+                    <th className="border px-4 py-2 text-left">Date of Birth</th>
+                    <th className="border px-4 py-2 text-left">Phone Numbers</th>
+                    <th className="border px-4 py-2 text-left">Province</th>
+                    <th className="border px-4 py-2 text-left">District</th>
+                    <th className="border px-4 py-2 text-left">Sector</th>
+                    <th className="border px-4 py-2 text-left">Cell</th>
+                    <th className="border px-4 py-2 text-left">Village</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {farmers.map((farmer) => {
+                    const location = farmer.location?.[0] ?? {};
+                    return (
+                      <tr key={farmer.id} className="hover:bg-gray-50">
+                        <td className="border px-4 py-2">{farmer.farmerNumber}</td>
+                        <td className="border px-4 py-2">{farmer.names}</td>
+                        <td className="border px-4 py-2">{farmer.gender}</td>
+                        <td className="border px-4 py-2">
+                          {new Date(farmer.dob).toLocaleDateString()}
+                        </td>
+                        <td className="border px-4 py-2">{farmer.phones.join(", ")}</td>
+                        <td className="border px-4 py-2">{location.province}</td>
+                        <td className="border px-4 py-2">{location.district}</td>
+                        <td className="border px-4 py-2">{location.sector}</td>
+                        <td className="border px-4 py-2">{location.cell}</td>
+                        <td className="border px-4 py-2">{location.village}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="mt-6 text-center text-gray-500">
+              <p>No farmers registered to this project.</p>
+            </div>
+          )}
     </div>
   );
 }

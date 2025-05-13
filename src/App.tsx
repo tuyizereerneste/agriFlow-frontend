@@ -27,6 +27,8 @@ import CompanyActivities from './components/company/CompanyActivities';
 import CompanyReports from './components/company/CompanyReports';
 import CompanyAnalytics from './components/company/CompanyAnalytics';
 import CompanyProfile from './components/company/CompanyProfile';
+import AttendanceReports from './pages/AttendanceReport';
+import AdminAnalytics from './pages/AdminAnalytics';
 function App() {
   return (
     <Router>
@@ -56,6 +58,8 @@ function App() {
           {/* Volunteer routes */}
           <Route path="/volunteer-management" element={<VolunteerManagement />} />
           <Route path="/reports" element={<Reports />} />
+          <Route path="/attendance-report" element={<AttendanceReports />} />
+          <Route path="/analytics" element={<AdminAnalytics />} />
 
 
           <Route path="/data-collection" element={<ComingSoon title="Data Collection" />} />
