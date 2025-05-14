@@ -47,7 +47,7 @@ export const ActivityAttendance: React.FC<ActivityAttendanceProps> = ({ projectI
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get<{ data: Practice[] }>(`http://localhost:5000/project/project-practices/${projectId}`, {
+        const response = await axios.get<{ data: Practice[] }>(`https://agriflow-backend-cw6m.onrender.com/project/project-practices/${projectId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setPractices(response.data.data);
@@ -68,7 +68,7 @@ export const ActivityAttendance: React.FC<ActivityAttendanceProps> = ({ projectI
         setLoading(true);
         setError(null);
         try {
-          const response = await axios.get<{ data: Activity[] }>(`http://localhost:5000/project/practice-activities/${selectedPractice}`, {
+          const response = await axios.get<{ data: Activity[] }>(`https://agriflow-backend-cw6m.onrender.com/project/practice-activities/${selectedPractice}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           setActivities(response.data.data);
@@ -91,7 +91,7 @@ export const ActivityAttendance: React.FC<ActivityAttendanceProps> = ({ projectI
         setError(null);
         try {
           console.log('Searching farmers with query:', query); // Debugging statement
-          const response = await axios.get<{ farmers: Farmer[] }>(`http://localhost:5000/search?query=${query}`, {
+          const response = await axios.get<{ farmers: Farmer[] }>(`https://agriflow-backend-cw6m.onrender.com/search?query=${query}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           console.log('Full search response:', response); // Log the entire response
@@ -126,7 +126,7 @@ export const ActivityAttendance: React.FC<ActivityAttendanceProps> = ({ projectI
       try {
         setLoading(true);
         setError(null);
-        const response = await axios.get<{ farmer: Farmer }>(`http://localhost:5000/farmers/${qrCodeMessage}`, {
+        const response = await axios.get<{ farmer: Farmer }>(`https://agriflow-backend-cw6m.onrender.com/farmers/${qrCodeMessage}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setFarmerQuery(response.data.farmer.names); // Update the farmer query with the farmer's name
@@ -169,7 +169,7 @@ export const ActivityAttendance: React.FC<ActivityAttendanceProps> = ({ projectI
     console.log('Request payload:', Object.fromEntries(formData.entries())); // Log the request payload
 
     try {
-      const response = await axios.post('http://localhost:5000/project/attendance', formData, {
+      const response = await axios.post('https://agriflow-backend-cw6m.onrender.com/project/attendance', formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
