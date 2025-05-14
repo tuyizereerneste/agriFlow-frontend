@@ -98,8 +98,8 @@ const ProjectDetails: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [showAttendanceModal, setShowAttendanceModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
-
   const token = localStorage.getItem('token');
 
   useEffect(() => {
@@ -114,9 +114,10 @@ const ProjectDetails: React.FC = () => {
       setError(null);
 
       try {
-        const response = await axios.get<{ message: string; data: ProjectDetails }>(`http://localhost:5000/project/get-project/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await axios.get<{ message: string; data: ProjectDetails }>(
+          `http://localhost:5000/project/get-project/${id}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
 
         setProject(response.data.data);
       } catch (error) {
@@ -134,110 +135,131 @@ const ProjectDetails: React.FC = () => {
     navigate(`/project/${id}/farmer/${farmerId}`);
   };
 
-  if (loading) {
-    return <p>Loading project details...</p>;
-  }
+  const filteredFarmers = project?.farmers
+    .filter(f =>
+      f.farmer.names.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      f.farmer.farmerNumber.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => a.farmer.names.localeCompare(b.farmer.names));
 
-  if (error) {
-    return <p className="text-red-500">{error}</p>;
-  }
-
-  if (!project) {
-    return <p>Project not found.</p>;
-  }
+  if (loading) return <p>Loading project details...</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
+  if (!project) return <p>Project not found.</p>;
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-4">{project.title}</h1>
-      <p className="text-gray-600 mb-2"><strong>Owner:</strong> {project.owner.name}</p>
-      <p className="text-gray-600 mb-2"><strong>Start Date:</strong> {new Date(project.startDate).toLocaleDateString()}</p>
-      <p className="text-gray-600 mb-2"><strong>End Date:</strong> {new Date(project.endDate).toLocaleDateString()}</p>
-      <p className="text-gray-600 mb-4"><strong>Objectives:</strong> {project.objectives}</p>
-      <p className="text-gray-600 mb-4">{project.description}</p>
+      {/* Project Info */}
+      <h1 className="text-3xl font-bold mb-2">{project.title}</h1>
+      <p className="text-gray-600 mb-1"><strong>Owner:</strong> {project.owner.name}</p>
+      <p className="text-gray-600 mb-1"><strong>Start Date:</strong> {new Date(project.startDate).toLocaleDateString()}</p>
+      <p className="text-gray-600 mb-1"><strong>End Date:</strong> {new Date(project.endDate).toLocaleDateString()}</p>
+      <p className="text-gray-600 mb-2"><strong>Objectives:</strong> {project.objectives}</p>
+      <p className="text-gray-600 mb-6">{project.description}</p>
 
-      {/* Target Practices Section */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-semibold mb-2">Target Practices</h2>
+      {/* Action Buttons */}
+      <div className="flex gap-4 mb-6">
+        <button
+          onClick={() => setShowModal(true)}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          Add Farmer to Project
+        </button>
+        <button
+          onClick={() => setShowAttendanceModal(true)}
+          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
+        >
+          <Users size={20} />
+          Record Attendance
+        </button>
+      </div>
+
+      {/* Target Practices */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-semibold mb-4">Target Practices & Activities</h2>
         {project.targetPractices.length > 0 ? (
-          <ul className="space-y-4">
-            {project.targetPractices.map((practice) => (
-              <li key={practice.id} className="border p-4 rounded-md shadow">
-                <p className="text-lg font-medium">{practice.title}</p>
-                <p className="text-sm text-gray-500">{practice.initialSituation}</p>
-              </li>
+          <div className="space-y-6">
+            {project.targetPractices.map(practice => (
+              <div key={practice.id} className="border p-4 rounded shadow">
+                <h3 className="text-lg font-bold">{practice.title}</h3>
+                <p className="text-sm text-gray-500 mb-2">{practice.initialSituation}</p>
+
+                {practice.activities.length > 0 && (
+                  <div className="ml-4 mt-2">
+                    <p className="font-medium text-gray-700">Activities:</p>
+                    <ul className="list-disc ml-6 text-sm text-gray-600">
+                      {practice.activities.map(activity => (
+                        <li key={activity.id}>{activity.title}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
             ))}
-          </ul>
+          </div>
         ) : (
           <p>No target practices associated with this project.</p>
         )}
       </div>
 
-      {/* Farmers Section */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-semibold mb-2">Farmers</h2>
-        {project.farmers.length > 0 ? (
+      {/* Farmer Search */}
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Search farmers by name or ID..."
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          className="w-full p-2 border rounded"
+        />
+      </div>
+
+      {/* Farmer List */}
+      <div className="mb-10">
+        <h2 className="text-2xl font-semibold mb-2">Registered Farmers</h2>
+        {filteredFarmers && filteredFarmers.length > 0 ? (
           <ul className="space-y-4">
-            {project.farmers.map((farmer) => (
+            {filteredFarmers.map(farmer => (
               <li
                 key={farmer.id}
-                className="border p-4 rounded-md shadow cursor-pointer"
                 onClick={() => handleFarmerClick(farmer.farmerId)}
+                className="border p-4 rounded shadow hover:bg-gray-50 cursor-pointer"
               >
                 <p className="text-lg font-medium">{farmer.farmer.names}</p>
                 <p className="text-sm text-gray-500">
                   <strong>Farmer Number:</strong> {farmer.farmer.farmerNumber}
                 </p>
                 <p className="text-sm text-gray-500">
-                  <Phone size={14} className="inline-block mr-1" /> {farmer.farmer.phones.join(', ')}
+                  <Phone size={14} className="inline-block mr-1" />
+                  {farmer.farmer.phones.join(', ')}
                 </p>
               </li>
             ))}
           </ul>
         ) : (
-          <p>No farmers associated with this project.</p>
+          <p>No matching farmers found.</p>
         )}
       </div>
 
-      {/* Add Farmer Button */}
-      <div className="min-h-screen bg-gray-100 p-8">
-        <div className="max-w-4xl mx-auto">
-          <button
-            onClick={() => setShowModal(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 mb-2"
-          >
-            Add Farmer to Project
-          </button>
-          <button
-            onClick={() => setShowAttendanceModal(true)}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
-          >
-            <Users size={20} />
-            Record Attendance
-          </button>
+      {/* Modals */}
+      {showModal && project && (
+        <AddFarmerModal
+          projectId={project.id}
+          projectTitle={project.title}
+          onClose={() => setShowModal(false)}
+          onSuccess={() => console.log('Farmer added successfully')}
+        />
+      )}
 
-          {showModal && project && (
-            <AddFarmerModal
-              projectId={project.id}
-              projectTitle={project.title}
-              onClose={() => setShowModal(false)}
-              onSuccess={() => {
-                console.log('Farmer added successfully');
-              }}
-            />
-          )}
-          {showAttendanceModal && project && (
-            <ActivityAttendance
-              projectId={project.id}
-              projectTitle={project.title}
-              onClose={() => setShowAttendanceModal(false)}
-              onSuccess={(record) => {
-                console.log('Attendance recorded:', record);
-                setShowAttendanceModal(false);
-              }}
-            />
-          )}
-        </div>
-      </div>
+      {showAttendanceModal && project && (
+        <ActivityAttendance
+          projectId={project.id}
+          projectTitle={project.title}
+          onClose={() => setShowAttendanceModal(false)}
+          onSuccess={record => {
+            console.log('Attendance recorded:', record);
+            setShowAttendanceModal(false);
+          }}
+        />
+      )}
     </div>
   );
 };

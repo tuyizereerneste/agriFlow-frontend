@@ -73,7 +73,7 @@ const FarmerDetails: React.FC = () => {
 
       try {
         const response = await axios.get<Farmer>(
-          `https://agriflow-backend-cw6m.onrender.com/farmer/get-farmer/${id}`,
+          `http://localhost:5000/farmer/get-farmer/${id}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setFarmer(response.data);
