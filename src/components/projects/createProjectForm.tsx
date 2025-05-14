@@ -49,7 +49,7 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({ onSuccess }) => {
   const fetchRegisteredCompanies = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get<{ data: Company[] }>(`http://localhost:5000/company/all`, {
+      const response = await axios.get<{ data: Company[] }>(`https://agriflow-backend-cw6m.onrender.com/company/all`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -149,7 +149,7 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({ onSuccess }) => {
       }
 
       const response = await axios.post<ProjectResponse>(
-        `http://localhost:5000/project/create-project`,
+        `https://agriflow-backend-cw6m.onrender.com/project/create-project`,
         formData,
         {
           headers: {
