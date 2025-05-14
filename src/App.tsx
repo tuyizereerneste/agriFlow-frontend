@@ -12,12 +12,23 @@ import ProjectsPage from './pages/ProjectsPage';
 import CreateProjectForm from './components/projects/createProjectForm';
 import ProjectDetails from './pages/ProjectDetails';
 import ProjectFarmerDetails from './components/projects/ProjectFarmerDetails';
-import FarmerToProject from './components/ProjectEnrollment/testSearch';
 
 import { AddFarmerModal } from './components/ProjectEnrollment/AddFarmerModal';
 import CompanyManagement from './components/companyDashboard/CompanyManagement';
 import VolunteerManagement from './components/VolunteerDashboard/VolunteerManagement';
 
+import CompanyDashboardLayout from "./components/layout/CompanyDashboardLayout";
+import CompanyProjectDetails from "./components/company/ProjectDetails";
+import Analytics from "./components/company/Analytics";
+import Reports from "./pages/Reports";
+import Notifications from "./components/company/Notifications";
+import CompanyOverview from './components/company/Overview';
+import CompanyActivities from './components/company/CompanyActivities';
+import CompanyReports from './components/company/CompanyReports';
+import CompanyAnalytics from './components/company/CompanyAnalytics';
+import CompanyProfile from './components/company/CompanyProfile';
+import AttendanceReports from './pages/AttendanceReport';
+import AdminAnalytics from './pages/AdminAnalytics';
 function App() {
   return (
     <Router>
@@ -46,6 +57,9 @@ function App() {
 
           {/* Volunteer routes */}
           <Route path="/volunteer-management" element={<VolunteerManagement />} />
+          <Route path="/reports" element={<Reports />} />
+          <Route path="/attendance-report" element={<AttendanceReports />} />
+          <Route path="/analytics" element={<AdminAnalytics />} />
 
 
           <Route path="/data-collection" element={<ComingSoon title="Data Collection" />} />
@@ -58,6 +72,15 @@ function App() {
         </Route>
         
         <Route path="*" element={<Navigate to="/login" replace />} />
+        {/* Company Dashboard */}
+        <Route path="/company" element={<CompanyDashboardLayout />}>
+          <Route path="overview" element={<CompanyOverview />} />
+          <Route path="activities" element={<CompanyActivities />} />
+          <Route path="analytics" element={<CompanyAnalytics />} />
+          <Route path="company-reports" element={<CompanyReports />} />
+          <Route path="notifications" element={<Notifications />} />
+          <Route path="company-profile" element={<CompanyProfile />} />
+        </Route>
       </Routes>
     </Router>
   );

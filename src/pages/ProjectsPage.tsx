@@ -23,10 +23,22 @@ interface TargetPractice {
   activities: Activity[];
 }
 
+interface ProjectOwner {
+  id: string;
+  name: string;
+  email: string;
+  type: string;
+  company: {
+    id: string;
+    logo: string;
+    tin: string;
+  };
+}
+
 interface Project {
   id: string;
   title: string;
-  owner: string;
+  owner: ProjectOwner;
   description?: string;
   objectives?: string;
   startDate: string;
@@ -34,6 +46,7 @@ interface Project {
   createdAt: string;
   targetPractices: TargetPractice[];
 }
+
 
 interface Pagination {
   total: number;
@@ -212,35 +225,36 @@ const ProjectsPage: React.FC = () => {
       ) : (
         <div className="bg-white shadow overflow-hidden rounded-md">
           <ul>
-            {Array.isArray(projects) && projects.length > 0 ? (
-              projects.map((project) => (
-                <li key={project.id} className="border-b">
-                  <Link to={`/project-details/${project.id}`} className="block p-4 hover:bg-gray-50 flex items-center">
-                    <div className="flex-1">
-                      <p className="text-lg font-medium">{project.title}</p>
-                      <p className="text-sm text-gray-500">
-                        <strong>Owner:</strong> {project.owner}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        <strong>Start Date:</strong> {new Date(project.startDate).toLocaleDateString()}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        <strong>End Date:</strong> {new Date(project.endDate).toLocaleDateString()}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        <strong>Objectives:</strong> {project.objectives}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        <strong>Target Practices:</strong> {project.targetPractices.map(practice => practice.title).join(', ')}
-                      </p>
-                    </div>
-                  </Link>
-                </li>
-              ))
-            ) : (
-              <p className="text-center py-6">No projects found</p>
-            )}
-          </ul>
+  {Array.isArray(projects) && projects.length > 0 ? (
+    projects.map((project) => (
+      <li key={project.id} className="border-b">
+        <Link to={`/project-details/${project.id}`} className="block p-4 hover:bg-gray-50 flex items-center">
+          <div className="flex-1">
+            <p className="text-lg font-medium">{project.title}</p>
+            <p className="text-sm text-gray-500">
+              <strong>Owner:</strong> {project.owner?.name || 'N/A'}
+            </p>
+            <p className="text-sm text-gray-500">
+              <strong>Start Date:</strong> {new Date(project.startDate).toLocaleDateString()}
+            </p>
+            <p className="text-sm text-gray-500">
+              <strong>End Date:</strong> {new Date(project.endDate).toLocaleDateString()}
+            </p>
+            <p className="text-sm text-gray-500">
+              <strong>Objectives:</strong> {project.objectives}
+            </p>
+            <p className="text-sm text-gray-500">
+              <strong>Target Practices:</strong> {project.targetPractices.map(practice => practice.title).join(', ')}
+            </p>
+          </div>
+        </Link>
+      </li>
+    ))
+  ) : (
+    <p className="text-center py-6">No projects found</p>
+  )}
+</ul>
+
         </div>
       )}
     </div>

@@ -225,7 +225,7 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
         
-        {/* Recent Activity */}
+        {/* Recent Activity
         <div className="bg-white rounded-lg shadow">
           <div className="p-5">
             <h3 className="text-lg font-medium text-gray-900">Recent Activity</h3>
@@ -266,6 +266,7 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
         </div>
+        */}
       </div>
     </div>
   );
