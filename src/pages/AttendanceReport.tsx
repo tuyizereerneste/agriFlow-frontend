@@ -4,7 +4,7 @@ import axios from "axios";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import * as XLSX from "xlsx";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 // Define types based on the response structure
 interface CompanyLocation {
@@ -88,6 +88,7 @@ interface AttendanceRecord extends Farmer {
   activityId: string;
   attendedAt: string;
   notes: string;
+  photos: string[];
 }
 
 interface ApiResponse {
@@ -226,11 +227,11 @@ export default function AttendanceReports() {
   useEffect(() => {
     const fetchAttendance = async () => {
       if (!selectedActivity) return;
-
+  
       setIsLoading(true);
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get<{ attendance: Array<{ id: string; farmer: Farmer; activityId: string; createdAt: string; notes: string }> }>(
+        const response = await axios.get<{ attendance: Array<{ id: string; farmer: Farmer; activityId: string; createdAt: string; notes: string; photos: string[] }> }>(
           `https://agriflow-backend-cw6m.onrender.com/project/attendance/${selectedActivity}`,
           {
             headers: {
@@ -238,15 +239,18 @@ export default function AttendanceReports() {
             },
           }
         );
-
-        // Transform the response data to match the expected structure
+  
+        // Base URL for the photos
+        const basePhotoUrl = "http://localhost:3000/uploads/attendance/";
+  
         const records = response.data.attendance.map(att => ({
           ...att.farmer,
           activityId: att.activityId,
           attendedAt: att.createdAt,
           notes: att.notes,
+          photos: att.photos.map(photo => basePhotoUrl + photo),
         }));
-
+  
         setAttendanceRecords(records);
       } catch (error) {
         console.error("Error fetching attendance records:", error);
@@ -255,13 +259,31 @@ export default function AttendanceReports() {
         setIsLoading(false);
       }
     };
-
+  
     fetchAttendance();
   }, [selectedActivity]);
+  
 
   const filteredAttendanceRecords = attendanceRecords.filter((record) =>
     record.names.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleRowClick = (record: AttendanceRecord) => {
+    // Assuming you have access to the project, practice, and activity details
+    const projectDetails = projects.find(p => p.id === selectedProject);
+    const practiceDetails = practices.find(tp => tp.id === selectedPractice);
+    const activityDetails = activities.find(a => a.id === selectedActivity);
+  
+    navigate(`/attendance-details/${record.id}`, {
+      state: {
+        farmerDetails: record,
+        project: projectDetails,
+        practice: practiceDetails,
+        activity: activityDetails
+      }
+    });
+  };
+  
 
   const exportToExcel = () => {
     if (!selectedProj || !selectedPract || attendanceRecords.length === 0) {
@@ -363,10 +385,6 @@ export default function AttendanceReports() {
     doc.save("attendance-report.pdf");
   };
 
-  const handleRowClick = (id: string) => {
-    console.log(`Row clicked with ID: ${id}`);
-    // Add your desired logic here
-  };
 
   const selectedProj = Array.isArray(projects) ? projects.find((p) => p.id === selectedProject) : null;
   const selectedPract = Array.isArray(practices) ? practices.find((tp) => tp.id === selectedPractice) : null;
@@ -530,29 +548,28 @@ export default function AttendanceReports() {
             <tbody>
               {filteredAttendanceRecords.map((record) => {
                 const location = record.location?.[0] ?? {};
+                // Use record.id to get the farmerId
+                const farmerId = record.id;
                 return (
                   <tr
-                    key={record.id}
-                    className="hover:bg-gray-50 cursor-pointer"
-                    onClick={() => handleRowClick(record.id)}
-                  >
-                    <td className="border px-4 py-2">{record.farmerNumber}</td>
-                    <td className="border px-4 py-2">{record.names}</td>
-                    <td className="border px-4 py-2">{record.gender}</td>
-                    <td className="border px-4 py-2">
-                      {new Date(record.dob).toLocaleDateString()}
-                    </td>
-                    <td className="border px-4 py-2">{record.phones.join(", ")}</td>
-                    <td className="border px-4 py-2">{location.province}</td>
-                    <td className="border px-4 py-2">{location.district}</td>
-                    <td className="border px-4 py-2">{location.sector}</td>
-                    <td className="border px-4 py-2">{location.cell}</td>
-                    <td className="border px-4 py-2">{location.village}</td>
-                    <td className="border px-4 py-2">
-                      {new Date(record.attendedAt).toLocaleDateString()}
-                    </td>
-                    <td className="border px-4 py-2">{record.notes}</td>
-                  </tr>
+                      key={farmerId}
+                      className="hover:bg-gray-50 cursor-pointer"
+                      onClick={() => handleRowClick(record)}
+                    >
+                      <td className="border px-4 py-2">{record.farmerNumber}</td>
+                      <td className="border px-4 py-2">{record.names}</td>
+                      <td className="border px-4 py-2">{record.gender}</td>
+                      <td className="border px-4 py-2">{new Date(record.dob).toLocaleDateString()}</td>
+                      <td className="border px-4 py-2">{record.phones.join(", ")}</td>
+                      <td className="border px-4 py-2">{location.province}</td>
+                      <td className="border px-4 py-2">{location.district}</td>
+                      <td className="border px-4 py-2">{location.sector}</td>
+                      <td className="border px-4 py-2">{location.cell}</td>
+                      <td className="border px-4 py-2">{location.village}</td>
+                      <td className="border px-4 py-2">{new Date(record.attendedAt).toLocaleDateString()}</td>
+                      <td className="border px-4 py-2">{record.notes}</td>
+                    </tr>
+
                 );
               })}
             </tbody>
