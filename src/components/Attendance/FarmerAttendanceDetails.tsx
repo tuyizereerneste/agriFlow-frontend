@@ -31,6 +31,16 @@ const AttendanceDetails = () => {
         <p className="mb-2"><strong>Initial Situation:</strong> {practice?.initialSituation || "N/A"}</p>
       </div>
 
+      {/* Activity Details Section */}
+      <div className="bg-white shadow-md rounded p-4 mb-6">
+        <h2 className="text-xl font-semibold mb-4">Activity Details</h2>
+        <p className="mb-2"><strong>Title:</strong> {activity?.title || "N/A"}</p>
+        <p className="mb-2"><strong>Description:</strong> {activity?.description || "N/A"}</p>
+        <p className="mb-2"><strong>Start Date:</strong> {activity?.startDate ? new Date(activity.startDate).toLocaleDateString() : "N/A"}</p>
+        <p className="mb-2"><strong>End Date:</strong> {activity?.endDate ? new Date(activity.endDate).toLocaleDateString() : "N/A"}</p>
+        <p className="mb-2"><strong>Notes:</strong> {farmerDetails.notes || "N/A"}</p>
+      </div>
+
       {/* Farmer Details Section */}
       <div className="bg-white shadow-md rounded p-4 mb-6">
         <h2 className="text-xl font-semibold mb-4">Farmer Details</h2>
@@ -46,19 +56,10 @@ const AttendanceDetails = () => {
         <p className="mb-2"><strong>Village:</strong> {farmerDetails.location?.[0]?.village || "N/A"}</p>
       </div>
 
-      {/* Activity Details Section */}
-      <div className="bg-white shadow-md rounded p-4 mb-6">
-        <h2 className="text-xl font-semibold mb-4">Activity Details</h2>
-        <p className="mb-2"><strong>Title:</strong> {activity?.title || "N/A"}</p>
-        <p className="mb-2"><strong>Description:</strong> {activity?.description || "N/A"}</p>
-        <p className="mb-2"><strong>Start Date:</strong> {activity?.startDate ? new Date(activity.startDate).toLocaleDateString() : "N/A"}</p>
-        <p className="mb-2"><strong>End Date:</strong> {activity?.endDate ? new Date(activity.endDate).toLocaleDateString() : "N/A"}</p>
-        <p className="mb-2"><strong>Notes:</strong> {farmerDetails.notes || "N/A"}</p>
-      </div>
 
       {/* Photos Section */}
       <div className="bg-white shadow-md rounded p-4">
-        <h2 className="text-xl font-semibold mb-4">Photos</h2>
+        <h2 className="text-xl font-semibold mb-4">Activity Photos</h2>
         {farmerDetails.photos && farmerDetails.photos.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {farmerDetails.photos.map((photo: string, index: number) => (
