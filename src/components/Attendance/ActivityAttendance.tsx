@@ -132,13 +132,13 @@ export const ActivityAttendance: React.FC<ActivityAttendanceProps> = ({ projectI
   
             // ✅ Use new endpoint that fetches farmer by qrCode
             const response = await axios.get<{ farmer: Farmer }>(
-              `http://localhost:5000/farmer/by-qrcode/${decodedText}`,
+              `https://agriflow-backend-cw6m.onrender.com/farmer/by-qrcode/${decodedText}`,
               { headers: { Authorization: `Bearer ${token}` } }
             );
   
             const farmer = response.data.farmer;
             setSelectedFarmer(farmer.id);
-            setFarmerQuery(farmer.names); // Display the farmer's name in the input
+            setFarmerQuery(farmer.names);
           } catch (error) {
             console.error("Error retrieving farmer info:", error);
             setError("Failed to retrieve farmer info.");
