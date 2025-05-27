@@ -38,7 +38,7 @@ const VolunteerManagement: React.FC = () => {
 
   const fetchVolunteers = async () => {
     try {
-      const response = await axios.get<Volunteer[]>('https://agriflow-backend-cw6m.onrender.com/volunteer/get-all-volunteers', {
+      const response = await axios.get<Volunteer[]>('http://localhost:5000/volunteer/get-all-volunteers', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -60,7 +60,7 @@ const VolunteerManagement: React.FC = () => {
 
   const deleteVolunteer = async (id: string) => {
     try {
-      await axios.delete(`https://agriflow-backend-cw6m.onrender.com/volunteer/delete-volunteer/${id}`, {
+      await axios.delete(`http://localhost:5000/volunteer/delete-volunteer/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

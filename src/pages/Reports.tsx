@@ -94,7 +94,7 @@ export default function CompanyReports() {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get<{ message: string; data: Company[] }>(
-          `https://agriflow-backend-cw6m.onrender.com/company/all`,
+          `http://localhost:5000/company/all`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -124,7 +124,7 @@ export default function CompanyReports() {
           const userId = selectedCompany.userId;
           const token = localStorage.getItem("token");
           const response = await axios.get<ApiResponse>(
-            `https://agriflow-backend-cw6m.onrender.com/project/get-company-projects/${userId}`,
+            `http://localhost:5000/project/get-company-projects/${userId}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -151,7 +151,7 @@ export default function CompanyReports() {
         try {
           const token = localStorage.getItem("token");
           const response = await axios.get<{ message: string; data: TargetPractice[] }>(
-            `https://agriflow-backend-cw6m.onrender.com/project/project-practices/${selectedProject}`,
+            `http://localhost:5000/project/project-practices/${selectedProject}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -179,7 +179,7 @@ export default function CompanyReports() {
         try {
           const token = localStorage.getItem("token");
           const response = await axios.get<{ message: string; data: { farmers: any[] } }>(
-            `https://agriflow-backend-cw6m.onrender.com/get-practice-farmers/${selectedPractice}`,
+            `http://localhost:5000/get-practice-farmers/${selectedPractice}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -208,7 +208,7 @@ export default function CompanyReports() {
 
   try {
     const response = await axios.post(
-      "https://agriflow-backend-cw6m.onrender.com/project/excel-export",
+      "http://localhost:5000/project/excel-export",
       { practiceId: selectedPractice },
       {
         responseType: "blob",

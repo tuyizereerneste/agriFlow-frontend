@@ -47,7 +47,7 @@ export const ActivityAttendance: React.FC<ActivityAttendanceProps> = ({ projectI
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get<{ data: Practice[] }>(`https://agriflow-backend-cw6m.onrender.com/project/project-practices/${projectId}`, {
+        const response = await axios.get<{ data: Practice[] }>(`http://localhost:5000/project/project-practices/${projectId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setPractices(response.data.data);
@@ -68,7 +68,7 @@ export const ActivityAttendance: React.FC<ActivityAttendanceProps> = ({ projectI
         setLoading(true);
         setError(null);
         try {
-          const response = await axios.get<{ data: Activity[] }>(`https://agriflow-backend-cw6m.onrender.com/project/practice-activities/${selectedPractice}`, {
+          const response = await axios.get<{ data: Activity[] }>(`http://localhost:5000/project/practice-activities/${selectedPractice}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           setActivities(response.data.data);
@@ -90,7 +90,7 @@ export const ActivityAttendance: React.FC<ActivityAttendanceProps> = ({ projectI
         setLoading(true);
         setError(null);
         try {
-          const response = await axios.get<{ farmers: Farmer[] }>(`https://agriflow-backend-cw6m.onrender.com/search?query=${query}`, {
+          const response = await axios.get<{ farmers: Farmer[] }>(`http://localhost:5000/search?query=${query}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           setFarmers(response.data.farmers);
@@ -117,10 +117,10 @@ export const ActivityAttendance: React.FC<ActivityAttendanceProps> = ({ projectI
     setScanning(true);
     setError(null);
   
-    const html5QrCode = new Html5Qrcode("qr-reader");
-    const config = { fps: 10, qrbox: 250 };
-  
     try {
+      const html5QrCode = new Html5Qrcode("qr-reader");
+      const config = { fps: 10, qrbox: 250 };
+  
       await html5QrCode.start(
         { facingMode: "environment" },
         config,
@@ -130,9 +130,9 @@ export const ActivityAttendance: React.FC<ActivityAttendanceProps> = ({ projectI
           try {
             setLoading(true);
   
-            // ✅ Use new endpoint that fetches farmer by qrCode
+            // Use new endpoint that fetches farmer by qrCode
             const response = await axios.get<{ farmer: Farmer }>(
-              `https://agriflow-backend-cw6m.onrender.com/farmer/by-qrcode/${decodedText}`,
+              `http://localhost:5000/farmer/by-qrcode/${decodedText}`,
               { headers: { Authorization: `Bearer ${token}` } }
             );
   
@@ -145,11 +145,10 @@ export const ActivityAttendance: React.FC<ActivityAttendanceProps> = ({ projectI
           } finally {
             setLoading(false);
   
-            // ✅ Stop and clear the scanner after scan
-            html5QrCode.stop().then(() => {
-              html5QrCode.clear();
-              setScanning(false);
-            });
+            // Stop and clear the scanner after scan
+            await html5QrCode.stop();
+            await html5QrCode.clear();
+            setScanning(false);
           }
         },
         (errorMessage) => {
@@ -162,25 +161,21 @@ export const ActivityAttendance: React.FC<ActivityAttendanceProps> = ({ projectI
       setScanning(false);
     }
   };
-  // Stop the scanner and clear the QR code reader
-  // when the component unmounts or when the scan is canceled
+  
 
 
   const handleCancelScan = async () => {
     try {
-      const qrCode = new Html5Qrcode("qr-reader");
-      const isRunning = qrCode.isScanning;
-  
-      if (isRunning) {
-        await qrCode.stop();
-      }
-      await qrCode.clear();
+      const html5QrCode = new Html5Qrcode("qr-reader");
+      await html5QrCode.stop();
+      await html5QrCode.clear();
     } catch (err) {
       console.error("Error while canceling QR scan:", err);
     } finally {
       setScanning(false);
     }
   };
+  
   
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -205,7 +200,7 @@ export const ActivityAttendance: React.FC<ActivityAttendanceProps> = ({ projectI
     formData.append('notes', notes);
 
     try {
-      const response = await axios.post('https://agriflow-backend-cw6m.onrender.com/project/attendance', formData, {
+      const response = await axios.post('http://localhost:5000/project/attendance', formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },

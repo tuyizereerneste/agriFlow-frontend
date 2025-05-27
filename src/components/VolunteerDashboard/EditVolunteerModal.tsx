@@ -75,7 +75,7 @@ const EditVolunteerModal: React.FC<EditVolunteerModalProps> = ({ volunteer, onCl
     formDataToSend.append('locations', JSON.stringify(formData.location));
 
     try {
-      await axios.put(`https://agriflow-backend-cw6m.onrender.com/volunteer/update-volunteer/${formData.id}`, formDataToSend, {
+      await axios.put(`http://localhost:5000/volunteer/update-volunteer/${formData.id}`, formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
