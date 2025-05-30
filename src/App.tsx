@@ -30,6 +30,7 @@ import CompanyProfile from './components/company/CompanyProfile';
 import AttendanceReports from './pages/AttendanceReport';
 import AttendanceDetails from './components/Attendance/FarmerAttendanceDetails';
 import AdminAnalytics from './pages/AdminAnalytics';
+import FarmerAttendances from './components/Attendance/FarmerAttendances';
 function App() {
   return (
     <Router>
@@ -61,19 +62,10 @@ function App() {
           <Route path="reports" element={<Reports />} />
           <Route path="attendance-report" element={<AttendanceReports />} />
           <Route path="attendance-details/:farmerId" element={<AttendanceDetails />} />
+          <Route path="farmer-attendances/:farmerId" element={<FarmerAttendances />} />
           <Route path="analytics" element={<AdminAnalytics />} />
-
-
-          <Route path="data-collection" element={<ComingSoon title="Data Collection" />} />
-          <Route path="analytics" element={<ComingSoon title="Analytics" />} />
-          <Route path="training" element={<ComingSoon title="Training & Support" />} />
-          <Route path="market" element={<ComingSoon title="Market Connections" />} />
-          <Route path="partners" element={<ComingSoon title="Partners" />} />
-          <Route path="calendar" element={<ComingSoon title="Calendar" />} />
-          <Route path="help" element={<ComingSoon title="Help" />} />
         </Route>
         
-        <Route path="*" element={<Navigate to="/login" replace />} />
         {/* Company Dashboard */}
         <Route path="/company" element={<CompanyDashboardLayout />}>
           <Route path="overview" element={<CompanyOverview />} />

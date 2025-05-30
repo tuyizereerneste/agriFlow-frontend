@@ -132,7 +132,7 @@ const ProjectDetails: React.FC = () => {
   }, [id, token]);
 
   const handleFarmerClick = (farmerId: string) => {
-    navigate(`/project/${id}/farmer/${farmerId}`);
+    navigate(`/admin/project/${id}/farmer/${farmerId}`);
   };
 
   const filteredFarmers = project?.farmers

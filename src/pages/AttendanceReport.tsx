@@ -112,6 +112,7 @@ export default function AttendanceReports() {
   const [error, setError] = useState<string | null>(null);
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<Farmer[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -241,14 +242,18 @@ export default function AttendanceReports() {
         );
   
         // Base URL for the photos
-        const basePhotoUrl = "http://localhost:3000/uploads/attendance/";
+        const basePhotoUrl = "http://localhost:5000/uploads/attendance/";
   
         const records = response.data.attendance.map(att => ({
           ...att.farmer,
           activityId: att.activityId,
           attendedAt: att.createdAt,
           notes: att.notes,
-          photos: att.photos.map(photo => basePhotoUrl + photo),
+          photos: att.photos.map(photo => {
+            const photoUrl = basePhotoUrl + photo;
+            console.log(photoUrl);
+            return photoUrl;
+          }),
         }));
   
         setAttendanceRecords(records);
@@ -262,11 +267,53 @@ export default function AttendanceReports() {
   
     fetchAttendance();
   }, [selectedActivity]);
+
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      if (searchQuery.trim().length > 1) {
+        searchFarmers(searchQuery);
+      } else {
+        setSearchResults([]);
+      }
+    }, 300); // debounce
+  
+    return () => clearTimeout(delayDebounce);
+  }, [searchQuery]);
+  
+  const searchFarmers = async (query: string) => {
+    try {
+      const response = await axios.get<{ farmers: Farmer[] }>(
+        `http://localhost:5000/search?query=${query}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
+  
+      if (response.data && Array.isArray(response.data.farmers)) {
+        setSearchResults(response.data.farmers);
+      } else {
+        setSearchResults([]);
+        setError('Unexpected response format');
+      }
+    } catch (err) {
+      console.error('Error searching farmers:', err);
+      setError('Failed to search farmers');
+      setSearchResults([]);
+    }
+  };
+
+  const handleSelectFarmer = (farmerId: string) => {
+    setSearchQuery('');
+    setSearchResults([]);
+    navigate(`/admin/farmer-attendances/${farmerId}`);
+  };
+  
+  
   
 
-  const filteredAttendanceRecords = attendanceRecords.filter((record) =>
-    record.names.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredAttendanceRecords = attendanceRecords;
 
   const handleRowClick = (record: AttendanceRecord) => {
     // Assuming you have access to the project, practice, and activity details
@@ -274,7 +321,7 @@ export default function AttendanceReports() {
     const practiceDetails = practices.find(tp => tp.id === selectedPractice);
     const activityDetails = activities.find(a => a.id === selectedActivity);
   
-    navigate(`/attendance-details/${record.id}`, {
+    navigate(`/admin/attendance-details/${record.id}`, {
       state: {
         farmerDetails: record,
         project: projectDetails,
@@ -398,18 +445,31 @@ export default function AttendanceReports() {
       <h1 className="text-2xl font-bold mb-4">Attendance Reports</h1>
 
       {/* Search Bar */}
-      <div className="mb-4">
-        <div className="relative">
+        <div className="relative mb-6">
           <input
             type="text"
-            placeholder="Search by farmer name..."
-            className="border rounded px-3 py-2 pl-10 w-full"
+            placeholder="Search farmers..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full border border-gray-300 rounded px-3 py-2"
           />
-          <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+
+          {/* Dropdown with search results */}
+          {searchResults.length > 0 && (
+            <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded mt-1 max-h-60 overflow-auto">
+              {searchResults.map((farmer) => (
+                <li
+                  key={farmer.id}
+                  onClick={() => handleSelectFarmer(farmer.id)}
+                  className="cursor-pointer px-3 py-2 hover:bg-gray-200"
+                >
+                  {farmer.names}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
-      </div>
+
 
       {/* Filters */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">

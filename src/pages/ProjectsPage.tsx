@@ -228,7 +228,7 @@ const ProjectsPage: React.FC = () => {
   {Array.isArray(projects) && projects.length > 0 ? (
     projects.map((project) => (
       <li key={project.id} className="border-b">
-        <Link to={`/project-details/${project.id}`} className="block p-4 hover:bg-gray-50 flex items-center">
+        <Link to={`/admin/project-details/${project.id}`} className="block p-4 hover:bg-gray-50 flex items-center">
           <div className="flex-1">
             <p className="text-lg font-medium">{project.title}</p>
             <p className="text-sm text-gray-500">

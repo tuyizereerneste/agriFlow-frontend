@@ -223,7 +223,7 @@ const Farmers: React.FC = () => {
             {farmers.length > 0 ? (
               farmers.map((farmer) => (
                 <li key={farmer.id} className="border-b">
-                  <Link to={`/farmer-details/${farmer.id}`} className="block p-4 hover:bg-gray-50 flex items-center">
+                  <Link to={`/admin/farmer-details/${farmer.id}`} className="block p-4 hover:bg-gray-50 flex items-center">
                     <div className="flex-1">
                       <p className="text-lg font-medium">{farmer.names}</p>
                       <p className="text-sm text-gray-500">

@@ -61,18 +61,21 @@ const AttendanceDetails = () => {
       <div className="bg-white shadow-md rounded p-4">
         <h2 className="text-xl font-semibold mb-4">Activity Photos</h2>
         {farmerDetails.photos && farmerDetails.photos.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {farmerDetails.photos.map((photo: string, index: number) => (
-            <div key={index} className="border rounded p-2">
-                <img src={photo} alt={`Activity Photo ${index + 1}`} className="w-full h-auto rounded" />
-            </div>
-            ))}
-        </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {farmerDetails.photos.map((photo: string, index: number) => {
+              console.log(photo);
+              return (
+                <div key={index} className="border rounded p-2">
+                  <img src={photo} alt={`Activity Photo ${index + 1}`} className="w-full h-auto rounded" />
+                </div>
+              );
+            })}
+          </div>
         ) : (
-        <p>No photos available.</p>
+          <p>No photos available.</p>
         )}
-
       </div>
+
     </div>
   );
 };
