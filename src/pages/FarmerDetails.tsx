@@ -124,7 +124,7 @@ const FarmerDetails: React.FC = () => {
   return (
     <div className="flex flex-col items-center min-h-screen py-10">
       <div className="mb-6 flex items-center">
-        <Link to="/farmers" className="flex items-center text-blue-600 hover:underline">
+        <Link to="/admin/farmers" className="flex items-center text-blue-600 hover:underline">
           <ArrowLeft className="mr-2" size={18} />
           Back to Farmers
         </Link>

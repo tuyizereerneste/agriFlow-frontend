@@ -1,7 +1,8 @@
-import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import debounce from 'lodash.debounce';
-import { Html5Qrcode } from 'html5-qrcode';
+import QRScanner from './QRScanner';
+import ImageCaptureModal from './ImageCapture';
 
 interface Activity {
   id: string;
@@ -35,11 +36,11 @@ export const ActivityAttendance: React.FC<ActivityAttendanceProps> = ({ projectI
   const [farmers, setFarmers] = useState<Farmer[]>([]);
   const [selectedFarmer, setSelectedFarmer] = useState<string | null>(null);
   const [images, setImages] = useState<File[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [notes, setNotes] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [scanning, setScanning] = useState<boolean>(false);
-  const captureInputRef = useRef<HTMLInputElement>(null);
 
   const token = useMemo(() => localStorage.getItem('token'), []);
 
@@ -114,92 +115,35 @@ export const ActivityAttendance: React.FC<ActivityAttendanceProps> = ({ projectI
     debouncedSearch(query);
   };
 
-  const handleScanQRCode = async () => {
+  const handleScanQRCode = () => {
     setScanning(true);
-    setError(null);
-  
-    try {
-      const html5QrCode = new Html5Qrcode("qr-reader");
-      const config = { fps: 10, qrbox: 250 };
-  
-      await html5QrCode.start(
-        { facingMode: "environment" },
-        config,
-        async (decodedText) => {
-          console.log("QR Code scanned:", decodedText);
-  
-          try {
-            setLoading(true);
-  
-            // Use new endpoint that fetches farmer by qrCode
-            const response = await axios.get<{ farmer: Farmer }>(
-              `http://localhost:5000/farmer/by-qrcode/${decodedText}`,
-              { headers: { Authorization: `Bearer ${token}` } }
-            );
-  
-            const farmer = response.data.farmer;
-            setSelectedFarmer(farmer.id);
-            setFarmerQuery(farmer.names);
-          } catch (error) {
-            console.error("Error retrieving farmer info:", error);
-            setError("Failed to retrieve farmer info.");
-          } finally {
-            setLoading(false);
-  
-            // Stop and clear the scanner after scan
-            await html5QrCode.stop();
-            await html5QrCode.clear();
-            setScanning(false);
-          }
-        },
-        (errorMessage) => {
-          console.warn("QR scan error:", errorMessage);
-        }
-      );
-    } catch (err) {
-      console.error("QR Scanner start failed:", err);
-      setError("Failed to start QR scanner.");
-      setScanning(false);
-    }
-  };
-  
-
-
-  const handleCancelScan = async () => {
-    try {
-      const html5QrCode = new Html5Qrcode("qr-reader");
-      await html5QrCode.stop();
-      await html5QrCode.clear();
-    } catch (err) {
-      console.error("Error while canceling QR scan:", err);
-    } finally {
-      setScanning(false);
-    }
   };
 
-  // Trigger hidden camera input
-const handleCaptureClick = () => {
-  captureInputRef.current?.click();
-};
-  
-  
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      setImages([...images, ...Array.from(event.target.files)]);
-    }
+  const handleCancelScan = () => {
+    setScanning(false);
   };
 
-  // Handle live camera photo
-const handleCameraCapture = (event: React.ChangeEvent<HTMLInputElement>) => {
-  const files = event.target.files;
-  if (files) {
-    setImages((prev) => [...prev, ...Array.from(files)]);
+  const handleScan = (qrCodeData: { id: string; names: string }) => {
+    setSelectedFarmer(qrCodeData.id);
+    setFarmerQuery(qrCodeData.names);
+    setFarmers([]);
+    setScanning(false);
+  };
+  
+  
+  
+const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  if (event.target.files) {
+    setImages([...images, ...Array.from(event.target.files)]);
   }
 };
 
-// Remove selected image
 const handleRemoveImage = (indexToRemove: number) => {
   setImages((prev) => prev.filter((_, index) => index !== indexToRemove));
+};
+
+const handleCapture = (capturedFile: File) => {
+  setImages([...images, capturedFile]);
 };
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -306,20 +250,23 @@ const handleRemoveImage = (indexToRemove: number) => {
             )}
           </div>
 
-          {/* QR Code Scan */}
+          {/* QR Code Scan Button */}
           <div className="mb-4">
-            {!scanning && (
-              <button
-                type="button"
-                className="w-full p-2 bg-blue-500 text-white rounded-md"
-                onClick={handleScanQRCode}
-              >
-                Scan QR Code
-              </button>
-            )}
-            {scanning && (
-              <div>
-                <div id="qr-reader" className="w-full h-64 border rounded-md mt-2"></div>
+            <button
+              type="button"
+              className="w-full p-2 bg-blue-500 text-white rounded-md"
+              onClick={handleScanQRCode}
+              disabled={scanning}
+            >
+              Scan QR Code
+            </button>
+          </div>
+
+          {/* QR Scanner Modal */}
+          {scanning && (
+            <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center">
+              <div className="bg-white p-4 rounded-md">
+                <QRScanner onScan={handleScan} />
                 <button
                   type="button"
                   className="mt-2 w-full p-2 bg-red-500 text-white rounded-md"
@@ -328,8 +275,8 @@ const handleRemoveImage = (indexToRemove: number) => {
                   Cancel Scan
                 </button>
               </div>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Photos & Notes */}
           <div className="mb-4">
@@ -344,23 +291,20 @@ const handleRemoveImage = (indexToRemove: number) => {
               onChange={handleImageChange}
             />
 
-            {/* Take photo live */}
+            {/* Button to open the ImageCapture modal */}
             <button
               type="button"
-              onClick={handleCaptureClick}
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+              onClick={() => setIsModalOpen(true)}
+              className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
             >
-              📸 Take Photo
+              Take a Photo
             </button>
 
-            {/* Hidden camera input */}
-            <input
-              ref={captureInputRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={handleCameraCapture}
-              style={{ display: 'none' }}
+            {/* ImageCapture Modal */}
+            <ImageCaptureModal
+              isOpen={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+              onCapture={handleCapture}
             />
 
             {/* Show selected images with preview and delete */}
