@@ -47,7 +47,7 @@ const CompanyManagement: React.FC = () => {
 
   const fetchCompanies = async () => {
     try {
-      const response = await axios.get<{ data: Company[] }>('http://localhost:5000/company/get-all-companies', {
+      const response = await axios.get<{ data: Company[] }>('http://localhost:5000/company/all', {
         headers: {
           Authorization: `Bearer ${token}`,
         },

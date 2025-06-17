@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { MapPin, Phone, ArrowLeft, Edit, Trash } from "lucide-react";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 interface Partner {
   id: string;
@@ -60,6 +62,7 @@ const FarmerDetails: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [qrCode, setQrCode] = useState<string | null>(null);
+  const qrRef = useRef(null);
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
 
@@ -113,6 +116,47 @@ const FarmerDetails: React.FC = () => {
     // Navigate to the update page or open a modal for updating
     console.log("Update farmer:", farmer);
   };
+
+  const handleExport = async (format: "pdf" | "image") => {
+    if (!qrRef.current) return;
+  
+    try {
+      const canvas = await html2canvas(qrRef.current, {
+        scale: 3,
+        useCORS: true,
+      });
+  
+      if (format === "image") {
+        const imgData = canvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = imgData;
+        link.download = `${farmer?.names ?? 'Unknown'}_QR.png`;
+        link.click();
+      } else if (format === "pdf") {
+        const imgData = canvas.toDataURL("image/png");
+  
+        const pdf = new jsPDF({
+          orientation: "portrait",
+          unit: "pt",
+          format: "a4",
+        });
+  
+        // Calculate dimensions to center the image on the page
+        const imgWidth = 300;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        const x = (pdf.internal.pageSize.getWidth() - imgWidth) / 2;
+        const y = 60;
+  
+        pdf.addImage(imgData, "PNG", x, y, imgWidth, imgHeight);
+        if (farmer) {
+          pdf.save(`${farmer.names}_QR.pdf`);
+        }
+      }
+    } catch (error) {
+      console.error("Export failed:", error);
+    }
+  };
+  
 
   if (loading) return <p>Loading farmer details...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
@@ -321,21 +365,50 @@ const FarmerDetails: React.FC = () => {
 
         {/* QR Code Section */}
         <div className="m-8 bg-white shadow rounded-md p-6 w-full h-full max-w-sm">
-          <h2 className="text-xl font-semibold text-center mb-4">Farmer QR Code</h2>
-          <div className="text-center mb-4">
-            <p className="text-gray-800 font-medium">{farmer.names}</p>
-          </div>
-          {qrCode ? (
-            <div className="flex justify-center mb-4">
-              <img src={qrCode} alt="QR Code" className="w-35 h-35" />
+          <div
+            ref={qrRef}
+            className="bg-gray-100 shadow rounded-md p-6 w-full max-w-sm"
+            style={{ overflow: "visible" }}
+          >
+            <h2 className="text-xl font-semibold text-center mb-4">Farmer QR Code</h2>
+
+            <div className="text-center mb-4">
+              <p className="text-gray-800 font-medium">{farmer.names}</p>
             </div>
-          ) : (
-            <p>Loading QR Code...</p>
-          )}
-          <div className="text-center mt-4">
-            <p className="text-gray-600 font-medium">Farmer Number: {farmer.farmerNumber}</p>
+
+            {qrCode ? (
+              <div className="flex justify-center mb-4">
+                <img src={qrCode} alt="QR Code" className="w-35 h-35" />
+              </div>
+            ) : (
+              <p>Loading QR Code...</p>
+            )}
+
+            <div className="text-center mt-4">
+              <p className="text-gray-600 font-medium">
+                Farmer Number: {farmer.farmerNumber}
+              </p>
+            </div>
+          </div>
+
+          {/* Buttons for PDF and Image Export */}
+          <div className="flex gap-4 justify-center mt-6">
+            <button
+              onClick={() => handleExport("pdf")}
+              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            >
+              Export as PDF
+            </button>
+            <button
+              onClick={() => handleExport("image")}
+              className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+            >
+              Export as Image
+            </button>
           </div>
         </div>
+
+
       </div>
     </div>
   );

@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Plus, Minus, MapPin, Camera } from 'lucide-react';
+import { Plus, Minus, MapPin } from 'lucide-react';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
 import { format } from 'date-fns';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 interface Child {
   name: string;
@@ -75,6 +76,8 @@ const initialFormData: FarmerFormData = {
 const AddFarmerForm: React.FC = () => {
   const [formData, setFormData] = useState<FarmerFormData>(initialFormData);
   const [hasPartner, setHasPartner] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleFarmerChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -234,6 +237,8 @@ const AddFarmerForm: React.FC = () => {
       // Optionally, clear the form
       setFormData(initialFormData);
       setHasPartner(false);
+
+      navigate(-1);
 
     } catch (error) {
       console.error('Error submitting farmer data:', error);
