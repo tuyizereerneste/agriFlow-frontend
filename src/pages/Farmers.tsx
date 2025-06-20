@@ -89,7 +89,7 @@ const Farmers: React.FC = () => {
     setError(null);
 
     try {
-      const response = await axios.get<{ farmers: Farmer[] }>("http://localhost:5000/search", {
+      const response = await axios.get<{ farmers: Farmer[] }>("http://localhost:5000/api/search", {
         headers: { Authorization: `Bearer ${token}` },
         params: {
           query: searchTerm || undefined,
@@ -111,7 +111,7 @@ const Farmers: React.FC = () => {
 
   const exportFarmers = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/farmers/export-excel", {
+      const response = await axios.get("http://localhost:5000/api/farmers/export-excel", {
         headers: { Authorization: `Bearer ${token}` },
         responseType: "blob",
       });

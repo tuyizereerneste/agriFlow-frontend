@@ -38,7 +38,7 @@ const ImageCaptureModal = ({ isOpen, onClose, onCapture }: ImageCaptureModalProp
       left: 0,
       width: '100%',
       height: '100%',
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      backgroundColor: 'rgba(0, 0, 0, 0.7)', // Slightly darker background for better contrast
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
@@ -49,19 +49,58 @@ const ImageCaptureModal = ({ isOpen, onClose, onCapture }: ImageCaptureModalProp
         padding: '20px',
         borderRadius: '10px',
         width: '90%',
-        maxWidth: '500px'
+        maxWidth: '500px',
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)' // Adding a subtle shadow
       }}>
         <Webcam
           audio={false}
           ref={webcamRef}
           screenshotFormat="image/jpeg"
           videoConstraints={videoConstraints}
-          style={{ width: '100%' }}
+          style={{
+            width: '100%',
+            borderRadius: '5px', // Rounded corners for the webcam feed
+            marginBottom: '15px' // Space between webcam and buttons
+          }}
         />
-        <button type="button" onClick={capture} style={{ marginTop: '10px' }}>Capture Image</button>
-        <button onClick={onClose} style={{ marginLeft: '10px' }}>Cancel</button>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <button
+            type="button"
+            onClick={capture}
+            style={{
+              backgroundColor: '#3b82f6', // Blue background
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              padding: '10px 20px',
+              fontSize: '16px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginRight: '10px' // Space between buttons
+            }}
+          >
+            <span style={{ marginRight: '8px' }}>📷</span> Capture Image
+          </button>
+          <button
+            onClick={onClose}
+            style={{
+              backgroundColor: '#6b7280', // Gray background
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              padding: '10px 20px',
+              fontSize: '16px',
+              cursor: 'pointer'
+            }}
+          >
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
+    
   );
 };
 

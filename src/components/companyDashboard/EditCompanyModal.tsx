@@ -38,6 +38,7 @@ interface EditCompanyModalProps {
 const EditCompanyModal: React.FC<EditCompanyModalProps> = ({ company, onClose, onCompanyUpdated, onError }) => {
   const [formData, setFormData] = useState<Company>(company);
   const [logo, setLogo] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
   const token = localStorage.getItem('token');
 
   useEffect(() => {
@@ -98,7 +99,8 @@ const EditCompanyModal: React.FC<EditCompanyModalProps> = ({ company, onClose, o
     }
 
     try {
-      await axios.put(`http://localhost:5000/company/update-company/${formData.id}`, formDataToSend, {
+      setLoading(true);
+      await axios.put(`http://localhost:5000/api/company/update-company/${formData.id}`, formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
@@ -215,14 +217,16 @@ const EditCompanyModal: React.FC<EditCompanyModalProps> = ({ company, onClose, o
           <div className="flex justify-end mt-4">
             <button
               type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded"
+              disabled={loading}
+              className={`bg-blue-500 text-white px-4 py-2 rounded ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
-              Update
+              {loading ? 'Updating...' : 'Update'}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="bg-gray-500 text-white px-4 py-2 rounded ml-2"
+              disabled={loading}
+              className={`bg-gray-300 text-gray-700 px-4 py-2 rounded ml-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               Cancel
             </button>

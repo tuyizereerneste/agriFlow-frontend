@@ -76,14 +76,14 @@ const FarmerDetails: React.FC = () => {
 
       try {
         const response = await axios.get<Farmer>(
-          `http://localhost:5000/farmer/get-farmer/${id}`,
+          `http://localhost:5000/api/farmer/get-farmer/${id}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setFarmer(response.data);
 
         // Fetch QR Code
         const qrResponse = await axios.get<{ qrCode: string }>(
-          `http://localhost:5000/farmer/generate-qrcode/${response.data.id}`,
+          `http://localhost:5000/api/farmer/generate-qrcode/${response.data.id}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setQrCode(qrResponse.data.qrCode);
@@ -102,7 +102,7 @@ const FarmerDetails: React.FC = () => {
     if (!token || !farmer) return;
 
     try {
-      await axios.delete(`http://localhost:5000/farmer/delete-farmer/${id}`, {
+      await axios.delete(`http://localhost:5000/api/farmer/delete-farmer/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       navigate("/farmers");

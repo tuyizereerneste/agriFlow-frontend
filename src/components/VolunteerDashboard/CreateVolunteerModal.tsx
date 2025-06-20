@@ -30,6 +30,7 @@ const CreateVolunteerModal: React.FC<CreateVolunteerModalProps> = ({ onClose, on
     password: '',
     locations: [],
   });
+  const [loading, setLoading] = useState(false);
 
   const token = localStorage.getItem('token');
 
@@ -67,20 +68,25 @@ const CreateVolunteerModal: React.FC<CreateVolunteerModalProps> = ({ onClose, on
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    const formDataToSend = new FormData();
-    formDataToSend.append('name', formData.name);
-    formDataToSend.append('email', formData.email);
-    formDataToSend.append('password', formData.password);
-    formDataToSend.append('locations', JSON.stringify(formData.locations));
-
+  
     try {
-      await axios.post('http://localhost:5000/volunteer/register-volunteer', formDataToSend, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${token}`,
+      setLoading(true);
+      const response = await axios.post(
+        'http://localhost:5000/api/volunteer/register-volunteer',
+        {
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          locations: formData.locations,
         },
-      });
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
       onVolunteerCreated();
       onClose();
     } catch (error) {
@@ -88,6 +94,7 @@ const CreateVolunteerModal: React.FC<CreateVolunteerModalProps> = ({ onClose, on
       onError();
     }
   };
+  
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
@@ -184,14 +191,16 @@ const CreateVolunteerModal: React.FC<CreateVolunteerModalProps> = ({ onClose, on
           <div className="flex justify-end mt-4">
             <button
               type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded"
+              className={`bg-blue-500 text-white px-4 py-2 rounded ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              disabled={loading}
             >
-              Submit
+              {loading ? 'Creating...' : 'Create Volunteer'}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="bg-gray-500 text-white px-4 py-2 rounded ml-2"
+              disabled={loading}
+              className={`ml-2 bg-gray-300 text-gray-700 px-4 py-2 rounded ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               Cancel
             </button>

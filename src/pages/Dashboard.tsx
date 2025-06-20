@@ -1,99 +1,112 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { 
-  BarChart3, 
-  Calendar, 
-  FileText, 
+  BarChart3,  
   Users, 
   TrendingUp, 
-  ShoppingBag,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  Folder,
+  Leaf,
+  ListChecks
 } from 'lucide-react';
 import { cn } from '../utils/cn';
 
-const stats = [
-  { 
-    id: 1, 
-    name: 'Total Farmers', 
-    value: '543', 
-    change: '+12.3%', 
-    trend: 'up',
-    icon: <Users size={20} className="text-blue-500" />,
-    color: 'bg-blue-50'
-  },
-  { 
-    id: 2, 
-    name: 'Data Entries', 
-    value: '1,765', 
-    change: '+23.1%', 
-    trend: 'up',
-    icon: <FileText size={20} className="text-green-500" />,
-    color: 'bg-green-50'
-  },
-  { 
-    id: 3, 
-    name: 'Training Sessions', 
-    value: '24', 
-    change: '+4.5%', 
-    trend: 'up',
-    icon: <Calendar size={20} className="text-purple-500" />,
-    color: 'bg-purple-50'
-  },
-  { 
-    id: 4, 
-    name: 'Market Connections', 
-    value: '15', 
-    change: '-2.3%', 
-    trend: 'down',
-    icon: <ShoppingBag size={20} className="text-orange-500" />,
-    color: 'bg-orange-50'
-  },
-];
+interface StatItem {
+  id: string;
+  name: string;
+  value: number;
+  change: string;
+  trend: "up" | "down";
+  color: string;
+  icon: JSX.Element;
+}
 
-const recentActivities = [
-  {
-    id: 1,
-    user: 'John Doe',
-    action: 'added a new farmer',
-    subject: 'Maria Garcia',
-    time: '2 hours ago',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-  },
-  {
-    id: 2,
-    user: 'Sarah Johnson',
-    action: 'completed data collection for',
-    subject: 'Rice Cultivation Survey',
-    time: '4 hours ago',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-  },
-  {
-    id: 3,
-    user: 'Michael Brown',
-    action: 'scheduled a training session on',
-    subject: 'Sustainable Farming Practices',
-    time: 'Yesterday at 3:45 PM',
-    avatar: 'https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-  },
-  {
-    id: 4,
-    user: 'Emily Wilson',
-    action: 'created a new market connection with',
-    subject: 'Organic Produce Co-op',
-    time: 'Yesterday at 1:23 PM',
-    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-  },
-  {
-    id: 5,
-    user: 'David Lee',
-    action: 'updated farmer profile for',
-    subject: 'Carlos Rodriguez',
-    time: '2 days ago',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-  },
-];
+interface ProjectStatsResponse {
+  data: {
+    totalProjects: number;
+    totalPractices: number;
+    totalActivities: number;
+    totalEnrolledFarmers: number;
+    totalAttendance: number;
+  };
+};
 
 const Dashboard: React.FC = () => {
+  const [stats, setStats] = useState<StatItem[]>([]);
+
+useEffect(() => {
+  const fetchStats = async () => {
+    const token = localStorage.getItem("token");
+
+    try {
+      const res = await axios.get("http://localhost:5000/api/project-stats", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+
+      const data = (res.data as ProjectStatsResponse).data;
+
+      const formattedStats: StatItem[] = [
+        {
+          id: "1",
+          name: "Projects",
+          value: data.totalProjects,
+          change: "2%",
+          trend: "up",
+          color: "bg-indigo-100 text-indigo-700",
+          icon: <Folder className="h-6 w-6" />,
+        },
+        {
+          id: "2",
+          name: "Practices",
+          value: data.totalPractices,
+          change: "3%",
+          trend: "up",
+          color: "bg-green-100 text-green-700",
+          icon: <Leaf className="h-6 w-6" />,
+        },
+        {
+          id: "3",
+          name: "Activities",
+          value: data.totalActivities,
+          change: "1%",
+          trend: "down",
+          color: "bg-yellow-100 text-yellow-700",
+          icon: <ListChecks className="h-6 w-6" />,
+        },
+        {
+          id: "4",
+          name: "Enrolled Farmers",
+          value: data.totalEnrolledFarmers,
+          change: "5%",
+          trend: "up",
+          color: "bg-blue-100 text-blue-700",
+          icon: <Users className="h-6 w-6" />,
+        },
+        {
+          id: "5",
+          name: "Total Attendances",
+          value: data.totalAttendance,
+          change: "4%",
+          trend: "up",
+          color: "bg-purple-100 text-purple-700",
+          icon: <Users className="h-6 w-6" />,
+        },
+      ];
+
+      setStats(formattedStats);
+    } catch (err) {
+      console.error("Error fetching stats:", err);
+    }
+  };
+
+  fetchStats();
+}, []);
+
   return (
     <div>
       <div className="mb-6">
@@ -169,7 +182,7 @@ const Dashboard: React.FC = () => {
                 >
                   {stat.change}
                 </span>
-                <span className="ml-2 text-gray-500">from last month</span>
+                {/* <span className="ml-2 text-gray-500">from last month</span> */}
               </div>
             </div>
           </div>

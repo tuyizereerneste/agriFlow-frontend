@@ -121,7 +121,7 @@ export default function AttendanceReports() {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get<{ message: string; data: Company[] }>(
-          `http://localhost:5000/company/all`,
+          `http://localhost:5000/api/company/all`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -151,7 +151,7 @@ export default function AttendanceReports() {
           const userId = selectedCompany.userId;
           const token = localStorage.getItem("token");
           const response = await axios.get<ApiResponse>(
-            `http://localhost:5000/project/get-company-projects/${userId}`,
+            `http://localhost:5000/api/project/get-company-projects/${userId}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -178,7 +178,7 @@ export default function AttendanceReports() {
         try {
           const token = localStorage.getItem("token");
           const response = await axios.get<{ message: string; data: TargetPractice[] }>(
-            `http://localhost:5000/project/project-practices/${selectedProject}`,
+            `http://localhost:5000/api/project/project-practices/${selectedProject}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -205,7 +205,7 @@ export default function AttendanceReports() {
         try {
           const token = localStorage.getItem("token");
           const response = await axios.get<{ message: string; data: Activity[] }>(
-            `http://localhost:5000/project/practice-activities/${selectedPractice}`,
+            `http://localhost:5000/api/project/practice-activities/${selectedPractice}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -233,7 +233,7 @@ export default function AttendanceReports() {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get<{ attendance: Array<{ id: string; farmer: Farmer; activityId: string; createdAt: string; notes: string; photos: string[] }> }>(
-          `http://localhost:5000/project/attendance/${selectedActivity}`,
+          `http://localhost:5000/api/project/attendance/${selectedActivity}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -283,7 +283,7 @@ export default function AttendanceReports() {
   const searchFarmers = async (query: string) => {
     try {
       const response = await axios.get<{ farmers: Farmer[] }>(
-        `http://localhost:5000/search?query=${query}`,
+        `http://localhost:5000/api/search?query=${query}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -316,7 +316,6 @@ export default function AttendanceReports() {
   const filteredAttendanceRecords = attendanceRecords;
 
   const handleRowClick = (record: AttendanceRecord) => {
-    // Assuming you have access to the project, practice, and activity details
     const projectDetails = projects.find(p => p.id === selectedProject);
     const practiceDetails = practices.find(tp => tp.id === selectedPractice);
     const activityDetails = activities.find(a => a.id === selectedActivity);
@@ -333,41 +332,11 @@ export default function AttendanceReports() {
   
 
   const exportToExcel = () => {
-    if (!selectedProj || !selectedPract || attendanceRecords.length === 0) {
+    if (!selectedProj || !selectedPract || !selectedActivity || attendanceRecords.length === 0) {
       alert("Please select an activity with attendance records.");
       return;
     }
-
-    const worksheet = XLSX.utils.json_to_sheet(
-      filteredAttendanceRecords.map((record) => ({
-        "Farmer Number": record.farmerNumber,
-        Name: record.names,
-        Gender: record.gender,
-        "Date of Birth": record.dob,
-        Phones: record.phones.join(", "),
-        Province: record.location?.[0]?.province || "",
-        District: record.location?.[0]?.district || "",
-        Sector: record.location?.[0]?.sector || "",
-        Cell: record.location?.[0]?.cell || "",
-        Village: record.location?.[0]?.village || "",
-        "Attended At": record.attendedAt,
-        Notes: record.notes,
-      }))
-    );
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Attendance");
-    XLSX.writeFile(workbook, "attendance-records.xlsx");
-  };
-
-  const exportPDF = () => {
-    if (!selectedProj || !selectedPract || attendanceRecords.length === 0) {
-      alert("Please select an activity with attendance records.");
-      return;
-    }
-
-    const doc = new jsPDF();
-
-    // Project & Practice Details
+  
     const projectDetails = [
       ["Project Title", selectedProj.title],
       ["Description", selectedProj.description],
@@ -376,34 +345,25 @@ export default function AttendanceReports() {
       ["End Date", new Date(selectedProj.endDate).toLocaleDateString()],
       ["Objectives", selectedProj.objectives],
       ["Practice", selectedPract.title],
+      ["Activity", activities.find((a) => a.id === selectedActivity)?.title || "Unknown Activity"],
     ];
-
-    projectDetails.forEach(([label, value], index) => {
-      doc.text(`${label}: ${value}`, 14, 10 + index * 7);
-    });
-
-    // Add space before the table
-    const tableStartY = 10 + projectDetails.length * 7 + 10;
-
-    // Table data
+  
     const headers = [
-      [
-        "Farmer Number",
-        "Name",
-        "Gender",
-        "Date of Birth",
-        "Phones",
-        "Province",
-        "District",
-        "Sector",
-        "Cell",
-        "Village",
-        "Attended At",
-        "Notes",
-      ],
+      "Farmer Number",
+      "Name",
+      "Gender",
+      "Date of Birth",
+      "Phones",
+      "Province",
+      "District",
+      "Sector",
+      "Cell",
+      "Village",
+      "Attended At",
+      "Notes",
     ];
-
-    const data = filteredAttendanceRecords.map((record) => {
+  
+    const attendanceRows = filteredAttendanceRecords.map((record) => {
       const location = record.location?.[0] ?? {};
       return [
         record.farmerNumber,
@@ -420,15 +380,144 @@ export default function AttendanceReports() {
         record.notes,
       ];
     });
-
+  
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet([]);
+  
+    // Add project details to the worksheet
+    XLSX.utils.sheet_add_aoa(ws, projectDetails, { origin: "A1" });
+  
+    // Determine the start row for the headers
+    const startRow = projectDetails.length + 2;
+  
+    // Add headers to the worksheet
+    XLSX.utils.sheet_add_aoa(ws, [headers], { origin: `A${startRow}` });
+  
+    // Style the headers
+    headers.forEach((_, colIdx) => {
+      const cell = ws[XLSX.utils.encode_cell({ r: startRow - 1, c: colIdx })];
+      if (cell) {
+        cell.s = {
+          font: { bold: true },
+          alignment: { vertical: "center", horizontal: "center" },
+        };
+      }
+    });
+  
+    // Add attendance data to the worksheet
+    XLSX.utils.sheet_add_aoa(ws, attendanceRows, { origin: `A${startRow + 1}` });
+  
+    // Auto column widths
+    const allRows = [headers, ...attendanceRows];
+    const colWidths = headers.map((_, i) => {
+      const maxLength = allRows.reduce((acc, row) => {
+        const val = row[i] ?? "";
+        const len = String(val).length;
+        return Math.max(acc, len);
+      }, headers[i].length);
+      return { wch: maxLength + 2 };
+    });
+    ws["!cols"] = colWidths;
+  
+    // Add the worksheet to the workbook
+    XLSX.utils.book_append_sheet(wb, ws, "Attendance");
+  
+    // Write the workbook to a file
+    XLSX.writeFile(wb, "attendance-records.xlsx");
+  };
+  
+  const exportPDF = () => {
+    if (!selectedProj || !selectedPract || !selectedActivity || attendanceRecords.length === 0) {
+      alert("Please select an activity with attendance records.");
+      return;
+    }
+  
+    const doc = new jsPDF('landscape');
+  
+    // ✅ Optional: Company logo space
+    doc.setFontSize(10);
+    doc.text("Company Logo", 14, 10);
+  
+    // ✅ Project & Activity Details
+    const projectDetails = [
+      ["Project Title", selectedProj.title],
+      ["Description", selectedProj.description],
+      ["Owner", selectedProj.owner.name],
+      ["Start Date", new Date(selectedProj.startDate).toLocaleDateString()],
+      ["End Date", new Date(selectedProj.endDate).toLocaleDateString()],
+      ["Objectives", selectedProj.objectives],
+      ["Practice", selectedPract.title],
+      ["Activity", activities.find((a) => a.id === selectedActivity)?.title || "Unknown Activity"],
+    ];
+  
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text("Project's Activity Attendance Records", 14, 20);
+  
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+  
+    projectDetails.forEach(([label, value], index) => {
+      doc.text(`${label}:`, 14, 30 + index * 6);
+      doc.text(value, 60, 30 + index * 6, { maxWidth: 120 });
+    });
+  
+    // ✅ Table headers
+    const headers = [
+      "Farmer Number", "Name", "Gender", "Date of Birth", "Phones",
+      "Province", "District", "Sector", "Cell", "Village",
+      "Attended At", "Notes"
+    ];
+  
+    // ✅ Table data
+    const data = filteredAttendanceRecords.map((record) => {
+      const location = record.location?.[0] ?? {};
+      return [
+        record.farmerNumber,
+        record.names,
+        record.gender,
+        new Date(record.dob).toLocaleDateString(),
+        record.phones.join(", "),
+        location.province || "",
+        location.district || "",
+        location.sector || "",
+        location.cell || "",
+        location.village || "",
+        new Date(record.attendedAt).toLocaleDateString(),
+        record.notes || "",
+      ];
+    });
+  
+    const tableStartY = 30 + projectDetails.length * 6 + 10;
+  
+    // ✅ Use autoTable to render the table (handles wrapping, layout, page break)
     autoTable(doc, {
-      head: headers,
+      head: [headers],
       body: data,
       startY: tableStartY,
-      styles: { fontSize: 8 },
-      headStyles: { fillColor: [34, 197, 94] },
+      styles: {
+        fontSize: 8,
+        cellPadding: 2,
+        overflow: 'linebreak',
+        textColor: 0,
+        lineColor: 0,
+        lineWidth: 0.1,
+      },
+      headStyles: {
+        fontStyle: 'bold',
+        fillColor: [255, 255, 255],
+        textColor: 0,
+        lineColor: 0,
+        lineWidth: 0.1,
+      },
+      columnStyles: {
+        4: { cellWidth: 30 },
+        12: { cellWidth: 50 },
+      },
+      theme: 'grid',
     });
-
+    
+  
     doc.save("attendance-report.pdf");
   };
 

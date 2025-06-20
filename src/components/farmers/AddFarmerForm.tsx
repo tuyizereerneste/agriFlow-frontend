@@ -76,6 +76,7 @@ const initialFormData: FarmerFormData = {
 const AddFarmerForm: React.FC = () => {
   const [formData, setFormData] = useState<FarmerFormData>(initialFormData);
   const [hasPartner, setHasPartner] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -220,8 +221,9 @@ const AddFarmerForm: React.FC = () => {
     };
 
     try {
+      setLoading(true);
       const response = await axios.post(
-        'http://localhost:5000/farmer/create-farmer',
+        'http://localhost:5000/api/farmer/create-farmer',
         submitData,
         {
           headers: {
@@ -231,8 +233,8 @@ const AddFarmerForm: React.FC = () => {
         }
       );
 
-      alert('Farmer registered successfully!');
-      console.log('Response:', response.data);
+      // alert('Farmer registered successfully!');
+      // console.log('Response:', response.data);
 
       // Optionally, clear the form
       setFormData(initialFormData);
@@ -627,10 +629,12 @@ const AddFarmerForm: React.FC = () => {
           type="submit"
           variant="primary"
           size="lg"
-          className="w-full md:w-auto"
+          disabled={loading}
+          className={`w-full md:w-auto ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
-          Register Farmer
+          {loading ? 'Registering...' : 'Register Farmer'}
         </Button>
+          
       </div>
     </form>
   );

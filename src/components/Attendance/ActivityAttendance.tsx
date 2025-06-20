@@ -49,7 +49,7 @@ export const ActivityAttendance: React.FC<ActivityAttendanceProps> = ({ projectI
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get<{ data: Practice[] }>(`http://localhost:5000/project/project-practices/${projectId}`, {
+        const response = await axios.get<{ data: Practice[] }>(`http://localhost:5000/api/project/project-practices/${projectId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setPractices(response.data.data);
@@ -70,7 +70,7 @@ export const ActivityAttendance: React.FC<ActivityAttendanceProps> = ({ projectI
         setLoading(true);
         setError(null);
         try {
-          const response = await axios.get<{ data: Activity[] }>(`http://localhost:5000/project/practice-activities/${selectedPractice}`, {
+          const response = await axios.get<{ data: Activity[] }>(`http://localhost:5000/api/project/practice-activities/${selectedPractice}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           setActivities(response.data.data);
@@ -92,7 +92,7 @@ export const ActivityAttendance: React.FC<ActivityAttendanceProps> = ({ projectI
         setLoading(true);
         setError(null);
         try {
-          const response = await axios.get<{ farmers: Farmer[] }>(`http://localhost:5000/search?query=${query}`, {
+          const response = await axios.get<{ farmers: Farmer[] }>(`http://localhost:5000/api/search?query=${query}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           setFarmers(response.data.farmers);
@@ -165,7 +165,7 @@ const handleCapture = (capturedFile: File) => {
     formData.append('notes', notes);
 
     try {
-      const response = await axios.post('http://localhost:5000/project/attendance', formData, {
+      const response = await axios.post('http://localhost:5000/api/project/attendance', formData, {
         headers: {
 	      "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${localStorage.getItem('token')}`,

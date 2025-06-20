@@ -93,7 +93,7 @@ const ProjectsPage: React.FC = () => {
     setError(null);
 
     try {
-      const response = await axios.get<{ data: Project[]; pagination: Pagination }>("http://localhost:5000/project/search", {
+      const response = await axios.get<{ data: Project[]; pagination: Pagination }>("http://localhost:5000/api/project/search", {
         headers: { Authorization: `Bearer ${token}` },
         params: {
           query: searchTerm || undefined,
@@ -119,7 +119,7 @@ const ProjectsPage: React.FC = () => {
 
   const exportProjects = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/projects/export-excel", {
+      const response = await axios.get("http://localhost:5000/api/projects/export-excel", {
         headers: { Authorization: `Bearer ${token}` },
         responseType: "blob",
       });
