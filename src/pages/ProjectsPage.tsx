@@ -93,7 +93,7 @@ const ProjectsPage: React.FC = () => {
     setError(null);
 
     try {
-      const response = await axios.get<{ data: Project[]; pagination: Pagination }>("https://agriflow-backend-cw6m.onrender.com/project/search", {
+      const response = await axios.get<{ data: Project[]; pagination: Pagination }>("http://localhost:5000/api/project/search", {
         headers: { Authorization: `Bearer ${token}` },
         params: {
           query: searchTerm || undefined,
@@ -119,7 +119,7 @@ const ProjectsPage: React.FC = () => {
 
   const exportProjects = async () => {
     try {
-      const response = await axios.get("https://agriflow-backend-cw6m.onrender.com/projects/export-excel", {
+      const response = await axios.get("http://localhost:5000/api/projects/export-excel", {
         headers: { Authorization: `Bearer ${token}` },
         responseType: "blob",
       });
@@ -228,7 +228,7 @@ const ProjectsPage: React.FC = () => {
   {Array.isArray(projects) && projects.length > 0 ? (
     projects.map((project) => (
       <li key={project.id} className="border-b">
-        <Link to={`/project-details/${project.id}`} className="block p-4 hover:bg-gray-50 flex items-center">
+        <Link to={`/admin/project-details/${project.id}`} className="block p-4 hover:bg-gray-50 flex items-center">
           <div className="flex-1">
             <p className="text-lg font-medium">{project.title}</p>
             <p className="text-sm text-gray-500">

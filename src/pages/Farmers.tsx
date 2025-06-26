@@ -89,7 +89,7 @@ const Farmers: React.FC = () => {
     setError(null);
 
     try {
-      const response = await axios.get<{ farmers: Farmer[] }>("https://agriflow-backend-cw6m.onrender.com/search", {
+      const response = await axios.get<{ farmers: Farmer[] }>("http://localhost:5000/api/search", {
         headers: { Authorization: `Bearer ${token}` },
         params: {
           query: searchTerm || undefined,
@@ -111,7 +111,7 @@ const Farmers: React.FC = () => {
 
   const exportFarmers = async () => {
     try {
-      const response = await axios.get("https://agriflow-backend-cw6m.onrender.com/farmers/export-excel", {
+      const response = await axios.get("http://localhost:5000/api/farmers/export-excel", {
         headers: { Authorization: `Bearer ${token}` },
         responseType: "blob",
       });
@@ -223,7 +223,7 @@ const Farmers: React.FC = () => {
             {farmers.length > 0 ? (
               farmers.map((farmer) => (
                 <li key={farmer.id} className="border-b">
-                  <Link to={`/farmer-details/${farmer.id}`} className="block p-4 hover:bg-gray-50 flex items-center">
+                  <Link to={`/admin/farmer-details/${farmer.id}`} className="block p-4 hover:bg-gray-50 flex items-center">
                     <div className="flex-1">
                       <p className="text-lg font-medium">{farmer.names}</p>
                       <p className="text-sm text-gray-500">

@@ -5,7 +5,7 @@ const links = [
   { label: "Overview", path: "/company/overview" },
   { label: "Project Activities", path: "/company/activities" },
   { label: "Analytics", path: "/company/analytics" },
-  { label: "Reports", path: "/company/reports" }, 
+  { label: "Reports", path: "/company/company-reports" }, 
   { label: "Notifications", path: "/company/notifications" },
   // { label: "Profile", path: "/company/profile" },
 ];

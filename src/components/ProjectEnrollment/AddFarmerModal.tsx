@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Search, X, Plus, Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface Farmer {
   id: string;
@@ -48,11 +49,12 @@ export function AddFarmerModal({ projectId, projectTitle, onClose, onSuccess }: 
   const [searchResults, setSearchResults] = useState<Farmer[]>([]);
 
   const token = localStorage.getItem('token');
+  const navigate = useNavigate();
 
   // Search farmers
   const searchFarmers = async (query: string) => {
     try {
-      const response = await axios.get<{ farmers: Farmer[] }>(`https://agriflow-backend-cw6m.onrender.com/search?query=${query}`, {
+      const response = await axios.get<{ farmers: Farmer[] }>(`http://localhost:5000/api/search?query=${query}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -76,7 +78,7 @@ export function AddFarmerModal({ projectId, projectTitle, onClose, onSuccess }: 
   // Fetch farmer lands
   const fetchFarmerLands = async (farmerId: string) => {
     try {
-      const response = await axios.get(`https://agriflow-backend-cw6m.onrender.com/farmer/farmer-land/${farmerId}`, {
+      const response = await axios.get(`http://localhost:5000/api/farmer/farmer-land/${farmerId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setFarmerLands(response.data as Land[]);
@@ -89,7 +91,7 @@ export function AddFarmerModal({ projectId, projectTitle, onClose, onSuccess }: 
   // Fetch project practices
   const fetchProjectPractices = async () => {
     try {
-      const response = await axios.get<{ data: TargetPractice[] }>(`https://agriflow-backend-cw6m.onrender.com/project/project-practices/${projectId}`, {
+      const response = await axios.get<{ data: TargetPractice[] }>(`http://localhost:5000/api/project/project-practices/${projectId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -126,7 +128,7 @@ export function AddFarmerModal({ projectId, projectTitle, onClose, onSuccess }: 
 
     try {
       setIsLoading(true);
-      const response = await axios.post<{ message: string }>('https://agriflow-backend-cw6m.onrender.com/project/enroll-farmer', payload, {
+      const response = await axios.post<{ message: string }>('http://localhost:5000/api/project/enroll-farmer', payload, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
@@ -200,16 +202,28 @@ export function AddFarmerModal({ projectId, projectTitle, onClose, onSuccess }: 
           {/* Farmer Search */}
           {!selectedFarmer ? (
             <div className="space-y-4">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search farmers..."
-                  className="w-full pl-10 pr-4 py-2 border rounded-lg"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                <Search className="absolute left-3 top-2.5 text-gray-400" size={20} />
+              <div className="space-y-2">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search farmers..."
+                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                  <Search className="absolute left-3 top-2.5 text-gray-400" size={20} />
+                </div>
+
+                <div className="flex justify-end">
+                  <button
+                    className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition"
+                    onClick={() => navigate('/admin/create-farmer-form')}
+                  >
+                    + Create New Farmer
+                  </button>
+                </div>
               </div>
+
 
               {searchTerm && (
                 <div className="mt-2 space-y-2">

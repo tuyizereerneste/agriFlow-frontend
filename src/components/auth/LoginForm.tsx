@@ -1,12 +1,20 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
 
 interface LoginResponse {
   token: string;
+}
+
+interface DecodedToken {
+  id: string;
+  role?: string;
+  type: string;
+  exp: number;
 }
 
 const LoginForm: React.FC = () => {
@@ -52,17 +60,29 @@ const LoginForm: React.FC = () => {
     e.preventDefault();
 
     if (!validateForm()) return;
-
     setIsLoading(true);
 
     try {
-      const response = await axios.post<LoginResponse>('https://agriflow-backend-cw6m.onrender.com/auth/login', formData);
-      
-      // Assuming response contains a token
+      const response = await axios.post<LoginResponse>('http://localhost:5000/api/auth/login', formData);
       const { token } = response.data;
       localStorage.setItem('token', token);
 
-      navigate('/dashboard');
+      const decoded = jwtDecode<DecodedToken>(token);
+      console.log('Decoded token:', decoded);
+
+      if (decoded.role === 'Admin') {
+        console.log('Navigating to /admin/dashboard'); // Debugging line
+        navigate('/admin/dashboard');
+      } else if (decoded.type === 'company') {
+        console.log('Navigating to /company/overview'); // Debugging line
+        navigate('/company/overview');
+      } else if (decoded.role === 'Volunteer') {
+        console.log('Navigating to /volunteer'); // Debugging line
+        navigate('/volunteer');
+      } else {
+        console.log('Navigating to /login'); // Debugging line
+        navigate('/login');
+      }
     } catch (error: any) {
       console.error('Login error:', error);
       setErrors({
@@ -95,35 +115,35 @@ const LoginForm: React.FC = () => {
         required
       />
 
-      <Input
-        label="Password"
-        type={showPassword ? 'text' : 'password'}
-        name="password"
-        id="password"
-        autoComplete="current-password"
-        placeholder="Enter your password"
-        value={formData.password}
-        onChange={handleChange}
-        error={errors.password}
-        leftIcon={<Lock size={18} />}
-        rightIcon={
-          <button 
-            type="button" 
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer"
-          >
-            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-          </button>
-        }
-        required
-      />
+      <div className="relative">
+        <Input
+          label="Password"
+          type={showPassword ? 'text' : 'password'}
+          name="password"
+          id="password"
+          autoComplete="current-password"
+          placeholder="Enter your password"
+          value={formData.password}
+          onChange={handleChange}
+          error={errors.password}
+          leftIcon={<Lock size={18} />}
+          required
+        />
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute inset-y-0 right-3 top-[36px] flex items-center text-gray-500"
+        >
+          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+        </button>
+      </div>
 
       <div className="flex items-center justify-between">
         <div className="flex items-center">
           <input id="remember-me" name="remember-me" type="checkbox" className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded" />
           <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">Remember me</label>
         </div>
-        
+
         <div className="text-sm">
           <a href="#" className="font-medium text-primary-600 hover:text-primary-500">Forgot your password?</a>
         </div>
@@ -132,15 +152,6 @@ const LoginForm: React.FC = () => {
       <Button type="submit" variant="primary" size="lg" className="w-full" isLoading={isLoading}>
         Sign in
       </Button>
-
-      <div className="text-center mt-4">
-        <p className="text-sm text-gray-600">
-          Don't have an account?{' '}
-          <a href="#" className="font-medium text-primary-600 hover:text-primary-500">
-            Sign up
-          </a>
-        </p>
-      </div>
     </form>
   );
 };

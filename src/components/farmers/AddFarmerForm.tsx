@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Plus, Minus, MapPin, Camera } from 'lucide-react';
+import { Plus, Minus, MapPin } from 'lucide-react';
 import Button from '../ui/Button';
 import Input from '../ui/Input';
 import { format } from 'date-fns';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 interface Child {
   name: string;
@@ -75,6 +76,9 @@ const initialFormData: FarmerFormData = {
 const AddFarmerForm: React.FC = () => {
   const [formData, setFormData] = useState<FarmerFormData>(initialFormData);
   const [hasPartner, setHasPartner] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleFarmerChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -217,8 +221,9 @@ const AddFarmerForm: React.FC = () => {
     };
 
     try {
+      setLoading(true);
       const response = await axios.post(
-        'https://agriflow-backend-cw6m.onrender.com/farmer/create-farmer',
+        'http://localhost:5000/api/farmer/create-farmer',
         submitData,
         {
           headers: {
@@ -228,12 +233,14 @@ const AddFarmerForm: React.FC = () => {
         }
       );
 
-      alert('Farmer registered successfully!');
-      console.log('Response:', response.data);
+      // alert('Farmer registered successfully!');
+      // console.log('Response:', response.data);
 
       // Optionally, clear the form
       setFormData(initialFormData);
       setHasPartner(false);
+
+      navigate(-1);
 
     } catch (error) {
       console.error('Error submitting farmer data:', error);
@@ -622,10 +629,12 @@ const AddFarmerForm: React.FC = () => {
           type="submit"
           variant="primary"
           size="lg"
-          className="w-full md:w-auto"
+          disabled={loading}
+          className={`w-full md:w-auto ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
-          Register Farmer
+          {loading ? 'Registering...' : 'Register Farmer'}
         </Button>
+          
       </div>
     </form>
   );

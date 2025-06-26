@@ -115,7 +115,7 @@ const ProjectDetails: React.FC = () => {
 
       try {
         const response = await axios.get<{ message: string; data: ProjectDetails }>(
-          `https://agriflow-backend-cw6m.onrender.com/project/get-project/${id}`,
+          `http://localhost:5000/api/project/get-project/${id}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
@@ -132,7 +132,7 @@ const ProjectDetails: React.FC = () => {
   }, [id, token]);
 
   const handleFarmerClick = (farmerId: string) => {
-    navigate(`/project/${id}/farmer/${farmerId}`);
+    navigate(`/admin/project/${id}/farmer/${farmerId}`);
   };
 
   const filteredFarmers = project?.farmers

@@ -3,6 +3,7 @@ import { Download, FileText } from "lucide-react";
 import axios from "axios";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import * as XLSX from "xlsx";
 
 // Define types based on the response structure
 interface CompanyLocation {
@@ -94,7 +95,7 @@ export default function CompanyReports() {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get<{ message: string; data: Company[] }>(
-          `https://agriflow-backend-cw6m.onrender.com/company/all`,
+          `http://localhost:5000/api/company/all`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -124,7 +125,7 @@ export default function CompanyReports() {
           const userId = selectedCompany.userId;
           const token = localStorage.getItem("token");
           const response = await axios.get<ApiResponse>(
-            `https://agriflow-backend-cw6m.onrender.com/project/get-company-projects/${userId}`,
+            `http://localhost:5000/api/project/get-company-projects/${userId}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -151,7 +152,7 @@ export default function CompanyReports() {
         try {
           const token = localStorage.getItem("token");
           const response = await axios.get<{ message: string; data: TargetPractice[] }>(
-            `https://agriflow-backend-cw6m.onrender.com/project/project-practices/${selectedProject}`,
+            `http://localhost:5000/api/project/project-practices/${selectedProject}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -179,7 +180,7 @@ export default function CompanyReports() {
         try {
           const token = localStorage.getItem("token");
           const response = await axios.get<{ message: string; data: { farmers: any[] } }>(
-            `https://agriflow-backend-cw6m.onrender.com/get-practice-farmers/${selectedPractice}`,
+            `http://localhost:5000/api/project/get-practice-farmers/${selectedPractice}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -200,35 +201,87 @@ export default function CompanyReports() {
   }, [selectedPractice]);
   
 
-  const exportFarmersExcel = async () => {
-  if (!selectedPractice) {
-    alert("Please select a practice first.");
+const exportExcel = () => {
+  if (!selectedProj || !selectedPract || farmers.length === 0) {
+    alert("Please select a practice with registered farmers.");
     return;
   }
 
-  try {
-    const response = await axios.post(
-      "https://agriflow-backend-cw6m.onrender.com/project/excel-export",
-      { practiceId: selectedPractice },
-      {
-        responseType: "blob",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+  const projectDetails = [
+    ["Project Title", selectedProj.title],
+    ["Description", selectedProj.description],
+    ["Owner", selectedProj.owner.name],
+    ["Start Date", new Date(selectedProj.startDate).toLocaleDateString()],
+    ["End Date", new Date(selectedProj.endDate).toLocaleDateString()],
+    ["Objectives", selectedProj.objectives],
+    ["Practice", selectedPract.title],
+  ];
 
-    const url = window.URL.createObjectURL(new Blob([response.data as BlobPart]));
-    const link = document.createElement("a");
-    link.href = url;
-    link.setAttribute("download", "practice-farmers.xlsx");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  } catch (error) {
-    console.error("Error exporting Excel:", error);
-    alert("Failed to export Excel");
-  }
+  const headers = [
+    "Farmer Number",
+    "Name",
+    "Gender",
+    "Date of Birth",
+    "Phones",
+    "Province",
+    "District",
+    "Sector",
+    "Cell",
+    "Village",
+  ];
+
+  const farmerRows = farmers.map((farmer) => {
+    const location = farmer.location?.[0] ?? {};
+    return [
+      farmer.farmerNumber,
+      farmer.names,
+      farmer.gender,
+      new Date(farmer.dob).toLocaleDateString(),
+      farmer.phones.join(", "),
+      location.province || "",
+      location.district || "",
+      location.sector || "",
+      location.cell || "",
+      location.village || "",
+    ];
+  });
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet([]);
+
+  XLSX.utils.sheet_add_aoa(ws, projectDetails, { origin: "A1" });
+
+  const startRow = projectDetails.length + 2;
+
+  XLSX.utils.sheet_add_aoa(ws, [headers], { origin: `A${startRow}` });
+
+  headers.forEach((_, colIdx) => {
+    const cell = ws[XLSX.utils.encode_cell({ r: startRow - 1, c: colIdx })];
+    if (cell) {
+      cell.s = {
+        font: { bold: true },
+        alignment: { vertical: "center", horizontal: "center" },
+      };
+    }
+  });
+
+  XLSX.utils.sheet_add_aoa(ws, farmerRows, { origin: `A${startRow + 1}` });
+
+  // Auto column widths
+  const allRows = [headers, ...farmerRows];
+  const colWidths = headers.map((_, i) => {
+    const maxLength = allRows.reduce((acc, row) => {
+      const val = row[i] ?? "";
+      const len = String(val).length;
+      return Math.max(acc, len);
+    }, headers[i].length);
+    return { wch: maxLength + 2 };
+  });
+  ws["!cols"] = colWidths;
+
+  XLSX.utils.book_append_sheet(wb, ws, "Practice Farmers");
+
+  XLSX.writeFile(wb, "practice-farmers-report.xlsx");
 };
 
 const exportPDF = () => {
@@ -250,14 +303,22 @@ const exportPDF = () => {
     ["Practice", selectedPract.title],
   ];
 
+  doc.setFontSize(14);
+  doc.setFont("helvetica", "bold");
+  doc.text("Project Registered Farmers", 14, 10);
+
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "normal");
+
   projectDetails.forEach(([label, value], index) => {
-    doc.text(`${label}: ${value}`, 14, 10 + index * 7);
+    doc.text(`${label}:`, 14, 20 + index * 6);
+    doc.text(value, 60, 20 + index * 6, { maxWidth: 120 });
   });
 
   // Add space before the table
-  const tableStartY = 10 + projectDetails.length * 7 + 10;
+  const tableStartY = 20 + projectDetails.length * 6 + 10;
 
-  // Table data
+  // Table headers
   const headers = [
     [
       "Farmer Number",
@@ -273,6 +334,7 @@ const exportPDF = () => {
     ],
   ];
 
+  // Table body
   const data = farmers.map((farmer) => {
     const location = farmer.location?.[0] ?? {};
     return [
@@ -293,8 +355,21 @@ const exportPDF = () => {
     head: headers,
     body: data,
     startY: tableStartY,
-    styles: { fontSize: 8 },
-    headStyles: { fillColor: [34, 197, 94] },
+    styles: {
+      fontSize: 8,
+      textColor: 0, // ✅ black text
+      lineColor: 0, // ✅ black borders
+      lineWidth: 0.1,
+      cellPadding: 2,
+    },
+    headStyles: {
+      fontStyle: "bold",
+      textColor: 0,               // ✅ black header text
+      fillColor: [255, 255, 255], // ✅ white background
+      lineColor: 0,               // ✅ black header border
+      lineWidth: 0.1,
+    },
+    theme: "grid",
   });
 
   doc.save("practice-farmers-report.pdf");
@@ -315,6 +390,7 @@ const exportPDF = () => {
 
       {/* 🔍 Filters */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        {/* Company Select */}
         <select
           className="border rounded px-3 py-2"
           value={selectedCompanyId ?? ""}
@@ -322,6 +398,9 @@ const exportPDF = () => {
             setSelectedCompanyId(e.target.value);
             setSelectedProject(null);
             setSelectedPractice(null);
+            setProjects([]);
+            setPractices([]);
+            setFarmers([]);
           }}
         >
           <option value="">Select Company</option>
@@ -332,12 +411,15 @@ const exportPDF = () => {
           ))}
         </select>
 
+        {/* Project Select */}
         <select
           className="border rounded px-3 py-2"
           value={selectedProject ?? ""}
           onChange={(e) => {
             setSelectedProject(e.target.value);
             setSelectedPractice(null);
+            setPractices([]);
+            setFarmers([]);
           }}
           disabled={!selectedCompanyId}
         >
@@ -349,10 +431,14 @@ const exportPDF = () => {
           ))}
         </select>
 
+        {/* Practice Select */}
         <select
           className="border rounded px-3 py-2"
           value={selectedPractice ?? ""}
-          onChange={(e) => setSelectedPractice(e.target.value)}
+          onChange={(e) => {
+            setSelectedPractice(e.target.value);
+            setFarmers([]);
+          }}
           disabled={!selectedProject}
         >
           <option value="">Select Practice</option>
@@ -364,13 +450,15 @@ const exportPDF = () => {
         </select>
       </div>
 
+
       {/* 📤 Export Buttons */}
       <div className="flex gap-4 mb-4">
         <button
-          onClick={exportFarmersExcel} className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+          onClick={exportExcel}
+          className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
         >
           <Download size={16} />
-          Export CSV
+          Export excel
         </button>
         <button
           onClick={exportPDF}
@@ -406,7 +494,7 @@ const exportPDF = () => {
         </div>
       )}
 
-      {/* 🧑‍🌾 Farmers List */}
+      {/* Farmers List */}
       {farmers.length > 0 ? (
             <div className="overflow-x-auto mt-6">
               <h2 className="text-xl font-semibold mb-2">Registered Farmers</h2>

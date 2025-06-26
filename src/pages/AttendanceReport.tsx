@@ -112,6 +112,7 @@ export default function AttendanceReports() {
   const [error, setError] = useState<string | null>(null);
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<Farmer[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -120,7 +121,7 @@ export default function AttendanceReports() {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get<{ message: string; data: Company[] }>(
-          `https://agriflow-backend-cw6m.onrender.com/company/all`,
+          `http://localhost:5000/api/company/all`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -150,7 +151,7 @@ export default function AttendanceReports() {
           const userId = selectedCompany.userId;
           const token = localStorage.getItem("token");
           const response = await axios.get<ApiResponse>(
-            `https://agriflow-backend-cw6m.onrender.com/project/get-company-projects/${userId}`,
+            `http://localhost:5000/api/project/get-company-projects/${userId}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -177,7 +178,7 @@ export default function AttendanceReports() {
         try {
           const token = localStorage.getItem("token");
           const response = await axios.get<{ message: string; data: TargetPractice[] }>(
-            `https://agriflow-backend-cw6m.onrender.com/project/project-practices/${selectedProject}`,
+            `http://localhost:5000/api/project/project-practices/${selectedProject}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -204,7 +205,7 @@ export default function AttendanceReports() {
         try {
           const token = localStorage.getItem("token");
           const response = await axios.get<{ message: string; data: Activity[] }>(
-            `https://agriflow-backend-cw6m.onrender.com/project/practice-activities/${selectedPractice}`,
+            `http://localhost:5000/api/project/practice-activities/${selectedPractice}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -232,7 +233,7 @@ export default function AttendanceReports() {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get<{ attendance: Array<{ id: string; farmer: Farmer; activityId: string; createdAt: string; notes: string; photos: string[] }> }>(
-          `https://agriflow-backend-cw6m.onrender.com/project/attendance/${selectedActivity}`,
+          `http://localhost:5000/api/project/attendance/${selectedActivity}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -241,14 +242,18 @@ export default function AttendanceReports() {
         );
   
         // Base URL for the photos
-        const basePhotoUrl = "http://localhost:3000/uploads/attendance/";
+        const basePhotoUrl = "http://localhost:5000/uploads/attendance/";
   
         const records = response.data.attendance.map(att => ({
           ...att.farmer,
           activityId: att.activityId,
           attendedAt: att.createdAt,
           notes: att.notes,
-          photos: att.photos.map(photo => basePhotoUrl + photo),
+          photos: att.photos.map(photo => {
+            const photoUrl = basePhotoUrl + photo;
+            console.log(photoUrl);
+            return photoUrl;
+          }),
         }));
   
         setAttendanceRecords(records);
@@ -262,19 +267,60 @@ export default function AttendanceReports() {
   
     fetchAttendance();
   }, [selectedActivity]);
+
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      if (searchQuery.trim().length > 1) {
+        searchFarmers(searchQuery);
+      } else {
+        setSearchResults([]);
+      }
+    }, 300);
+  
+    return () => clearTimeout(delayDebounce);
+  }, [searchQuery]);
+  
+  const searchFarmers = async (query: string) => {
+    try {
+      const response = await axios.get<{ farmers: Farmer[] }>(
+        `http://localhost:5000/api/search?query=${query}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
+  
+      if (response.data && Array.isArray(response.data.farmers)) {
+        setSearchResults(response.data.farmers);
+      } else {
+        setSearchResults([]);
+        setError('Unexpected response format');
+      }
+    } catch (err) {
+      console.error('Error searching farmers:', err);
+      setError('Failed to search farmers');
+      setSearchResults([]);
+    }
+  };
+
+  const handleSelectFarmer = (farmerId: string) => {
+    setSearchQuery('');
+    setSearchResults([]);
+    navigate(`/admin/farmer-attendances/${farmerId}`);
+  };
+  
+  
   
 
-  const filteredAttendanceRecords = attendanceRecords.filter((record) =>
-    record.names.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredAttendanceRecords = attendanceRecords;
 
   const handleRowClick = (record: AttendanceRecord) => {
-    // Assuming you have access to the project, practice, and activity details
     const projectDetails = projects.find(p => p.id === selectedProject);
     const practiceDetails = practices.find(tp => tp.id === selectedPractice);
     const activityDetails = activities.find(a => a.id === selectedActivity);
   
-    navigate(`/attendance-details/${record.id}`, {
+    navigate(`/admin/attendance-details/${record.id}`, {
       state: {
         farmerDetails: record,
         project: projectDetails,
@@ -286,41 +332,11 @@ export default function AttendanceReports() {
   
 
   const exportToExcel = () => {
-    if (!selectedProj || !selectedPract || attendanceRecords.length === 0) {
+    if (!selectedProj || !selectedPract || !selectedActivity || attendanceRecords.length === 0) {
       alert("Please select an activity with attendance records.");
       return;
     }
-
-    const worksheet = XLSX.utils.json_to_sheet(
-      filteredAttendanceRecords.map((record) => ({
-        "Farmer Number": record.farmerNumber,
-        Name: record.names,
-        Gender: record.gender,
-        "Date of Birth": record.dob,
-        Phones: record.phones.join(", "),
-        Province: record.location?.[0]?.province || "",
-        District: record.location?.[0]?.district || "",
-        Sector: record.location?.[0]?.sector || "",
-        Cell: record.location?.[0]?.cell || "",
-        Village: record.location?.[0]?.village || "",
-        "Attended At": record.attendedAt,
-        Notes: record.notes,
-      }))
-    );
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Attendance");
-    XLSX.writeFile(workbook, "attendance-records.xlsx");
-  };
-
-  const exportPDF = () => {
-    if (!selectedProj || !selectedPract || attendanceRecords.length === 0) {
-      alert("Please select an activity with attendance records.");
-      return;
-    }
-
-    const doc = new jsPDF();
-
-    // Project & Practice Details
+  
     const projectDetails = [
       ["Project Title", selectedProj.title],
       ["Description", selectedProj.description],
@@ -329,34 +345,25 @@ export default function AttendanceReports() {
       ["End Date", new Date(selectedProj.endDate).toLocaleDateString()],
       ["Objectives", selectedProj.objectives],
       ["Practice", selectedPract.title],
+      ["Activity", activities.find((a) => a.id === selectedActivity)?.title || "Unknown Activity"],
     ];
-
-    projectDetails.forEach(([label, value], index) => {
-      doc.text(`${label}: ${value}`, 14, 10 + index * 7);
-    });
-
-    // Add space before the table
-    const tableStartY = 10 + projectDetails.length * 7 + 10;
-
-    // Table data
+  
     const headers = [
-      [
-        "Farmer Number",
-        "Name",
-        "Gender",
-        "Date of Birth",
-        "Phones",
-        "Province",
-        "District",
-        "Sector",
-        "Cell",
-        "Village",
-        "Attended At",
-        "Notes",
-      ],
+      "Farmer Number",
+      "Name",
+      "Gender",
+      "Date of Birth",
+      "Phones",
+      "Province",
+      "District",
+      "Sector",
+      "Cell",
+      "Village",
+      "Attended At",
+      "Notes",
     ];
-
-    const data = filteredAttendanceRecords.map((record) => {
+  
+    const attendanceRows = filteredAttendanceRecords.map((record) => {
       const location = record.location?.[0] ?? {};
       return [
         record.farmerNumber,
@@ -373,15 +380,134 @@ export default function AttendanceReports() {
         record.notes,
       ];
     });
+  
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet([]);
+  
+    XLSX.utils.sheet_add_aoa(ws, projectDetails, { origin: "A1" });
+  
+    const startRow = projectDetails.length + 2;
 
+    XLSX.utils.sheet_add_aoa(ws, [headers], { origin: `A${startRow}` });
+  
+    headers.forEach((_, colIdx) => {
+      const cell = ws[XLSX.utils.encode_cell({ r: startRow - 1, c: colIdx })];
+      if (cell) {
+        cell.s = {
+          font: { bold: true },
+          alignment: { vertical: "center", horizontal: "center" },
+        };
+      }
+    });
+  
+    XLSX.utils.sheet_add_aoa(ws, attendanceRows, { origin: `A${startRow + 1}` });
+  
+    const allRows = [headers, ...attendanceRows];
+    const colWidths = headers.map((_, i) => {
+      const maxLength = allRows.reduce((acc, row) => {
+        const val = row[i] ?? "";
+        const len = String(val).length;
+        return Math.max(acc, len);
+      }, headers[i].length);
+      return { wch: maxLength + 2 };
+    });
+    ws["!cols"] = colWidths;
+  
+    XLSX.utils.book_append_sheet(wb, ws, "Attendance");
+  
+    XLSX.writeFile(wb, "attendance-records.xlsx");
+  };
+  
+  const exportPDF = () => {
+    if (!selectedProj || !selectedPract || !selectedActivity || attendanceRecords.length === 0) {
+      alert("Please select an activity with attendance records.");
+      return;
+    }
+  
+    const doc = new jsPDF('landscape');
+  
+    // Optional: Company logo space
+    doc.setFontSize(10);
+    doc.text("Company Logo", 14, 10);
+  
+    // Project & Activity Details
+    const projectDetails = [
+      ["Project Title", selectedProj.title],
+      ["Description", selectedProj.description],
+      ["Owner", selectedProj.owner.name],
+      ["Start Date", new Date(selectedProj.startDate).toLocaleDateString()],
+      ["End Date", new Date(selectedProj.endDate).toLocaleDateString()],
+      ["Objectives", selectedProj.objectives],
+      ["Practice", selectedPract.title],
+      ["Activity", activities.find((a) => a.id === selectedActivity)?.title || "Unknown Activity"],
+    ];
+  
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.text("Project's Activity Attendance Records", 14, 20);
+  
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+  
+    projectDetails.forEach(([label, value], index) => {
+      doc.text(`${label}:`, 14, 30 + index * 6);
+      doc.text(value, 60, 30 + index * 6, { maxWidth: 120 });
+    });
+  
+    // Table headers
+    const headers = [
+      "Farmer Number", "Name", "Gender", "Date of Birth", "Phones",
+      "Province", "District", "Sector", "Cell", "Village",
+      "Attended At", "Notes"
+    ];
+  
+    const data = filteredAttendanceRecords.map((record) => {
+      const location = record.location?.[0] ?? {};
+      return [
+        record.farmerNumber,
+        record.names,
+        record.gender,
+        new Date(record.dob).toLocaleDateString(),
+        record.phones.join(", "),
+        location.province || "",
+        location.district || "",
+        location.sector || "",
+        location.cell || "",
+        location.village || "",
+        new Date(record.attendedAt).toLocaleDateString(),
+        record.notes || "",
+      ];
+    });
+  
+    const tableStartY = 30 + projectDetails.length * 6 + 10;
+  
     autoTable(doc, {
-      head: headers,
+      head: [headers],
       body: data,
       startY: tableStartY,
-      styles: { fontSize: 8 },
-      headStyles: { fillColor: [34, 197, 94] },
+      styles: {
+        fontSize: 8,
+        cellPadding: 2,
+        overflow: 'linebreak',
+        textColor: 0,
+        lineColor: 0,
+        lineWidth: 0.1,
+      },
+      headStyles: {
+        fontStyle: 'bold',
+        fillColor: [255, 255, 255],
+        textColor: 0,
+        lineColor: 0,
+        lineWidth: 0.1,
+      },
+      columnStyles: {
+        4: { cellWidth: 30 },
+        12: { cellWidth: 50 },
+      },
+      theme: 'grid',
     });
-
+    
+  
     doc.save("attendance-report.pdf");
   };
 
@@ -398,18 +524,31 @@ export default function AttendanceReports() {
       <h1 className="text-2xl font-bold mb-4">Attendance Reports</h1>
 
       {/* Search Bar */}
-      <div className="mb-4">
-        <div className="relative">
+        <div className="relative mb-6">
           <input
             type="text"
-            placeholder="Search by farmer name..."
-            className="border rounded px-3 py-2 pl-10 w-full"
+            placeholder="Search farmers..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full border border-gray-300 rounded px-3 py-2"
           />
-          <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+
+          {/* Dropdown with search results */}
+          {searchResults.length > 0 && (
+            <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded mt-1 max-h-60 overflow-auto">
+              {searchResults.map((farmer) => (
+                <li
+                  key={farmer.id}
+                  onClick={() => handleSelectFarmer(farmer.id)}
+                  className="cursor-pointer px-3 py-2 hover:bg-gray-200"
+                >
+                  {farmer.names}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
-      </div>
+
 
       {/* Filters */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">

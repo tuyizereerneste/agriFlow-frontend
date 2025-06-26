@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Bell, Menu, Search, X } from 'lucide-react';
-import { cn } from '../../utils/cn';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Bell, Menu, Search, X, User, Settings, LogOut } from 'lucide-react';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -9,9 +8,36 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const [showNotifications, setShowNotifications] = useState(false);
-  
-  const toggleNotifications = () => {
-    setShowNotifications(!showNotifications);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+
+  const profileRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+
+  const handleDocumentClick = (event: MouseEvent) => {
+    if (
+      profileRef.current &&
+      !profileRef.current.contains(event.target as Node)
+    ) {
+      setShowProfileDropdown(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('click', handleDocumentClick);
+    return () => {
+      document.removeEventListener('click', handleDocumentClick);
+    };
+  }, []);
+
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
+
+  const handleSettingsClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowProfileDropdown(false);
   };
 
   return (
@@ -47,89 +73,55 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
               </div>
             </div>
           </div>
+
           <div className="flex items-center">
+            {/* Notifications */}
             <div className="relative">
               <button
                 type="button"
                 className="p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                onClick={toggleNotifications}
+                onClick={() => setShowNotifications((prev) => !prev)}
               >
                 <span className="sr-only">View notifications</span>
                 <Bell className="h-6 w-6" aria-hidden="true" />
               </button>
-              {/* Notification badge */}
               <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400 ring-2 ring-white"></span>
-              
-              {/* Notification dropdown */}
-              {showNotifications && (
-                <div className="origin-top-right absolute right-0 mt-2 w-80 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
-                  <div className="px-4 py-2 border-b border-gray-200">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-medium text-gray-900">Notifications</h3>
-                      <button
-                        type="button"
-                        className="text-gray-400 hover:text-gray-500"
-                        onClick={toggleNotifications}
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-                  <div className="max-h-96 overflow-y-auto">
-                    {[1, 2, 3].map((item) => (
-                      <a
-                        key={item}
-                        href="#"
-                        className="block px-4 py-3 hover:bg-gray-50 transition ease-in-out duration-150"
-                      >
-                        <div className="flex items-center">
-                          <div className="flex-shrink-0">
-                            <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
-                              <span className="text-primary-600 font-medium">AB</span>
-                            </div>
-                          </div>
-                          <div className="ml-3">
-                            <p className="text-sm font-medium text-gray-900">
-                              New farmer registration
-                            </p>
-                            <p className="text-sm text-gray-500">
-                              John Doe has registered as a new farmer
-                            </p>
-                            <p className="mt-1 text-xs text-gray-400">
-                              2 hours ago
-                            </p>
-                          </div>
-                        </div>
-                      </a>
-                    ))}
-                  </div>
-                  <div className="border-t border-gray-200 px-4 py-2">
-                    <a
-                      href="#"
-                      className="text-sm font-medium text-primary-600 hover:text-primary-500"
-                    >
-                      View all notifications
-                    </a>
-                  </div>
+            </div>
+
+            {/* Profile Dropdown */}
+            <div
+              className="ml-4 relative flex-shrink-0"
+              ref={profileRef}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                type="button"
+                className="bg-white rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                onClick={() => setShowProfileDropdown((prev) => !prev)}
+              >
+                <span className="sr-only">Open user menu</span>
+                <User className="h-8 w-8 rounded-full" />
+              </button>
+
+              {showProfileDropdown && (
+                <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 z-20">
+                  <Link
+                    to="/admin/settings"
+                    onClick={handleSettingsClick}
+                    className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    <Settings className="inline-block h-4 w-4 mr-2" />
+                    Settings
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    <LogOut className="inline-block h-4 w-4 mr-2" />
+                    Logout
+                  </button>
                 </div>
               )}
-            </div>
-            
-            {/* Profile dropdown */}
-            <div className="ml-4 relative flex-shrink-0">
-              <div>
-                <Link
-                  to="/profile"
-                  className="bg-white rounded-full flex text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                >
-                  <span className="sr-only">Open user menu</span>
-                  <img
-                    className="h-8 w-8 rounded-full"
-                    src="https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                    alt="User profile"
-                  />
-                </Link>
-              </div>
             </div>
           </div>
         </div>

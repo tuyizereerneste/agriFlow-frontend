@@ -34,6 +34,7 @@ const CreateCompanyModal: React.FC<CreateCompanyModalProps> = ({ onClose, onComp
   });
 
   const [logo, setLogo] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
   const token = localStorage.getItem('token');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,7 +89,8 @@ const CreateCompanyModal: React.FC<CreateCompanyModalProps> = ({ onClose, onComp
     }
 
     try {
-      await axios.post('https://agriflow-backend-cw6m.onrender.com/company/register-company', formDataToSend, {
+      setLoading(true);
+      await axios.post('http://localhost:5000/api/company/register-company', formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
@@ -216,14 +218,16 @@ const CreateCompanyModal: React.FC<CreateCompanyModalProps> = ({ onClose, onComp
           <div className="flex justify-end mt-4">
             <button
               type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded"
+              disabled={loading}
+              className={`bg-blue-500 text-white px-4 py-2 rounded ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
-              Submit
+              {loading ? 'Creating...' : 'Create Company'}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="bg-gray-500 text-white px-4 py-2 rounded ml-2"
+              disabled={loading}
+              className={`ml-2 bg-gray-300 text-gray-700 px-4 py-2 rounded ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               Cancel
             </button>

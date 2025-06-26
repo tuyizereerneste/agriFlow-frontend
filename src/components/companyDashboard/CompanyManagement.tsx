@@ -47,7 +47,7 @@ const CompanyManagement: React.FC = () => {
 
   const fetchCompanies = async () => {
     try {
-      const response = await axios.get<{ data: Company[] }>('https://agriflow-backend-cw6m.onrender.com/company/get-all-companies', {
+      const response = await axios.get<{ data: Company[] }>('http://localhost:5000/api/company/all', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -69,7 +69,7 @@ const CompanyManagement: React.FC = () => {
 
   const deleteCompany = async (id: string) => {
     try {
-      await axios.delete(`https://agriflow-backend-cw6m.onrender.com/company/delete-company/${id}`, {
+      await axios.delete(`http://localhost:5000/api/company/delete-company/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -120,10 +120,11 @@ const CompanyManagement: React.FC = () => {
         {filteredCompanies.map(company => (
           <div key={company.id} className="bg-white p-4 rounded shadow">
             <img
-              src={`https://agriflow-backend-cw6m.onrender.com/uploads/logos/${company.logo}`}
+              src={`http://localhost:5000/uploads/logos/${company.logo}`}
               alt={company.user.name}
-              className="w-full h-32 object-cover mb-4 rounded"
+              className="w-40 h-40 object-contain p-2 mb-4 rounded-full bg-white shadow"
             />
+
             <h2 className="text-xl font-bold">{company.user.name}</h2>
             <p className="text-gray-600">{company.user.email}</p>
             <p className="text-gray-600">TIN: {company.tin}</p>
