@@ -121,7 +121,7 @@ export default function AttendanceReports() {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get<{ message: string; data: Company[] }>(
-          `http://localhost:5000/api/company/all`,
+          `https://agriflow-backend-cw6m.onrender.com/api/company/all`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -151,7 +151,7 @@ export default function AttendanceReports() {
           const userId = selectedCompany.userId;
           const token = localStorage.getItem("token");
           const response = await axios.get<ApiResponse>(
-            `http://localhost:5000/api/project/get-company-projects/${userId}`,
+            `https://agriflow-backend-cw6m.onrender.com/api/project/get-company-projects/${userId}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -178,7 +178,7 @@ export default function AttendanceReports() {
         try {
           const token = localStorage.getItem("token");
           const response = await axios.get<{ message: string; data: TargetPractice[] }>(
-            `http://localhost:5000/api/project/project-practices/${selectedProject}`,
+            `https://agriflow-backend-cw6m.onrender.com/api/project/project-practices/${selectedProject}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -205,7 +205,7 @@ export default function AttendanceReports() {
         try {
           const token = localStorage.getItem("token");
           const response = await axios.get<{ message: string; data: Activity[] }>(
-            `http://localhost:5000/api/project/practice-activities/${selectedPractice}`,
+            `https://agriflow-backend-cw6m.onrender.com/api/project/practice-activities/${selectedPractice}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -233,7 +233,7 @@ export default function AttendanceReports() {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get<{ attendance: Array<{ id: string; farmer: Farmer; activityId: string; createdAt: string; notes: string; photos: string[] }> }>(
-          `http://localhost:5000/api/project/attendance/${selectedActivity}`,
+          `https://agriflow-backend-cw6m.onrender.com/api/project/attendance/${selectedActivity}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -242,7 +242,7 @@ export default function AttendanceReports() {
         );
   
         // Base URL for the photos
-        const basePhotoUrl = "http://localhost:5000/uploads/attendance/";
+        const basePhotoUrl = "https://agriflow-backend-cw6m.onrender.com/uploads/attendance/";
   
         const records = response.data.attendance.map(att => ({
           ...att.farmer,
@@ -283,7 +283,7 @@ export default function AttendanceReports() {
   const searchFarmers = async (query: string) => {
     try {
       const response = await axios.get<{ farmers: Farmer[] }>(
-        `http://localhost:5000/api/search?query=${query}`,
+        `https://agriflow-backend-cw6m.onrender.com/api/search?query=${query}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,

@@ -54,7 +54,7 @@ export function AddFarmerModal({ projectId, projectTitle, onClose, onSuccess }: 
   // Search farmers
   const searchFarmers = async (query: string) => {
     try {
-      const response = await axios.get<{ farmers: Farmer[] }>(`http://localhost:5000/api/search?query=${query}`, {
+      const response = await axios.get<{ farmers: Farmer[] }>(`https://agriflow-backend-cw6m.onrender.com/api/search?query=${query}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -78,7 +78,7 @@ export function AddFarmerModal({ projectId, projectTitle, onClose, onSuccess }: 
   // Fetch farmer lands
   const fetchFarmerLands = async (farmerId: string) => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/farmer/farmer-land/${farmerId}`, {
+      const response = await axios.get(`https://agriflow-backend-cw6m.onrender.com/api/farmer/farmer-land/${farmerId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setFarmerLands(response.data as Land[]);
@@ -91,7 +91,7 @@ export function AddFarmerModal({ projectId, projectTitle, onClose, onSuccess }: 
   // Fetch project practices
   const fetchProjectPractices = async () => {
     try {
-      const response = await axios.get<{ data: TargetPractice[] }>(`http://localhost:5000/api/project/project-practices/${projectId}`, {
+      const response = await axios.get<{ data: TargetPractice[] }>(`https://agriflow-backend-cw6m.onrender.com/api/project/project-practices/${projectId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -128,7 +128,7 @@ export function AddFarmerModal({ projectId, projectTitle, onClose, onSuccess }: 
 
     try {
       setIsLoading(true);
-      const response = await axios.post<{ message: string }>('http://localhost:5000/api/project/enroll-farmer', payload, {
+      const response = await axios.post<{ message: string }>('https://agriflow-backend-cw6m.onrender.com/api/project/enroll-farmer', payload, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`

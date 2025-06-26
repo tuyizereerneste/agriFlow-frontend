@@ -47,7 +47,7 @@ const CompanyManagement: React.FC = () => {
 
   const fetchCompanies = async () => {
     try {
-      const response = await axios.get<{ data: Company[] }>('http://localhost:5000/api/company/all', {
+      const response = await axios.get<{ data: Company[] }>('https://agriflow-backend-cw6m.onrender.com/api/company/all', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -69,7 +69,7 @@ const CompanyManagement: React.FC = () => {
 
   const deleteCompany = async (id: string) => {
     try {
-      await axios.delete(`http://localhost:5000/api/company/delete-company/${id}`, {
+      await axios.delete(`https://agriflow-backend-cw6m.onrender.com/api/company/delete-company/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -120,7 +120,7 @@ const CompanyManagement: React.FC = () => {
         {filteredCompanies.map(company => (
           <div key={company.id} className="bg-white p-4 rounded shadow">
             <img
-              src={`http://localhost:5000/uploads/logos/${company.logo}`}
+              src={`https://agriflow-backend-cw6m.onrender.com/uploads/logos/${company.logo}`}
               alt={company.user.name}
               className="w-40 h-40 object-contain p-2 mb-4 rounded-full bg-white shadow"
             />

@@ -73,7 +73,7 @@ const EditVolunteerModal: React.FC<EditVolunteerModalProps> = ({ volunteer, onCl
     try {
       setLoading(true);
       const response = await axios.put(
-        `http://localhost:5000/api/volunteer/update-volunteer/${formData.id}`,
+        `https://agriflow-backend-cw6m.onrender.com/api/volunteer/update-volunteer/${formData.id}`,
         {
           name: formData.name,
           email: formData.email,

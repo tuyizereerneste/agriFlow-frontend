@@ -39,7 +39,7 @@ const Settings: React.FC = () => {
     const fetchProfile = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get<UserProfile>('http://localhost:5000/api/user/profile', {
+        const response = await axios.get<UserProfile>('https://agriflow-backend-cw6m.onrender.com/api/user/profile', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -67,7 +67,7 @@ const Settings: React.FC = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.post(
-        'http://localhost:5000/api/user/change-password',
+        'https://agriflow-backend-cw6m.onrender.com/api/user/change-password',
         {
           oldPassword,
           newPassword,
@@ -114,7 +114,7 @@ const Settings: React.FC = () => {
           <p><span className="font-semibold">TIN:</span> {user.company.tin}</p>
           {user.company.logo && (
             <img
-              src={`http://localhost:5000/uploads/logos/${user.company.logo}`}
+              src={`https://agriflow-backend-cw6m.onrender.com/uploads/logos/${user.company.logo}`}
               alt="Company Logo"
               className="w-32 h-32 object-contain border rounded mt-2"
             />
