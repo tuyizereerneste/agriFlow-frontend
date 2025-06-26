@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import ProtectedRoute from './utils/ProtectedRoute';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
@@ -38,7 +39,11 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         
-        <Route path="/admin" element={<MainLayout />}>
+        <Route path="/admin" element={
+          <ProtectedRoute>
+            <MainLayout />
+            </ProtectedRoute>
+          }>
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="profile" element={<Profile />} />
           <Route path="farmers" element={<Farmers />} />
@@ -67,7 +72,12 @@ function App() {
         </Route>
         
         {/* Company Dashboard */}
-        <Route path="/company" element={<CompanyDashboardLayout />}>
+        <Route path="/company" element={
+          <ProtectedRoute>
+            <CompanyDashboardLayout />
+            </ProtectedRoute>
+            }
+            >
           <Route path="overview" element={<CompanyOverview />} />
           <Route path="activities" element={<CompanyActivities />} />
           <Route path="analytics" element={<CompanyAnalytics />} />
@@ -80,14 +90,5 @@ function App() {
   );
 }
 
-// Temporary component for routes that are not yet implemented
-const ComingSoon: React.FC<{ title: string }> = ({ title }) => {
-  return (
-    <div className="text-center py-12">
-      <h1 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">{title}</h1>
-      <p className="text-gray-500 dark:text-gray-400">This feature is coming soon!</p>
-    </div>
-  );
-};
 
 export default App;

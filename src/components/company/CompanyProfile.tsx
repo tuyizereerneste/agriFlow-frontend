@@ -1,192 +1,144 @@
-import React, { useState } from 'react';
-import { Building2, Mail, Phone, MapPin, Camera, Lock } from 'lucide-react';
-import Button from '../ui/Button';
-import Input from '../ui/Input';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import CompanyChangePasswordModal from "./CompanyChangePasswordModal";
 
-const CompanyProfile: React.FC = () => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
-    name: 'AgroSolve Ltd.',
-    industry: 'Agricultural Technology',
-    email: 'contact@agrosolve.com',
-    phone: '+1 (800) 555-0199',
-    location: 'Nairobi, Kenya',
-    about:
-      'AgroSolve is committed to empowering farmers through data-driven solutions and sustainable practices. We partner with institutions to monitor, train, and support field projects for greater impact.',
-  });
+interface CompanyLocation {
+  province: string;
+  district: string;
+  sector: string;
+  cell: string;
+  village: string;
+}
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+interface CompanyProfileData {
+  id: string;
+  name: string;
+  email: string;
+  type: string;
+  role: string | null;
+  company: {
+    id: string;
+    logo: string | null;
+    tin: string;
+    location: CompanyLocation[];
+  } | null;
+}
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Save company profile changes
-    setIsEditing(false);
-  };
+export default function CompanyProfile() {
+  const [profile, setProfile] = useState<CompanyProfileData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          setError("No authentication token found.");
+          setLoading(false);
+          return;
+        }
+
+        const response = await axios.get<CompanyProfileData>(
+          "http://localhost:5000/api/user/profile",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        setProfile(response.data);
+      } catch (err) {
+        console.error("Error fetching profile:", err);
+        setError("Failed to load profile data.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  if (loading) return <p className="p-4 text-center">Loading profile...</p>;
+  if (error) return <p className="p-4 text-center text-red-500">{error}</p>;
+  if (!profile) return <p className="p-4 text-center">No profile data available.</p>;
+
+  const { name, email, company } = profile;
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">Company Profile</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Manage your company information and preferences
-        </p>
-      </div>
+    <div className="max-w-4xl mx-auto p-6 bg-gray-50 min-h-screen">
+      <div className="bg-white rounded-lg shadow-lg p-8">
+        <div className="flex flex-col items-center">
+          <h2 className="text-3xl font-bold mb-6 text-green-700">Company Profile</h2>
 
-      <div className="bg-white shadow rounded-lg overflow-hidden">
-        {/* Profile header */}
-        <div className="relative h-40 bg-primary-600">
-          <div className="absolute -bottom-12 left-6">
-            <div className="relative">
+          {/* Company Logo */}
+          <div className="mb-6">
+            {company?.logo ? (
               <img
-                className="h-24 w-24 rounded-full border-4 border-white"
-                src="https://images.unsplash.com/photo-1581093588401-9b1d53c0e148?auto=format&fit=crop&w=256&q=80"
+                src={`http://localhost:5000/uploads/logos/${company.logo}`}
                 alt="Company Logo"
+                className="w-32 h-32 object-contain rounded-full border-4 border-green-100 p-2"
               />
-              {isEditing && (
-                <button
-                  type="button"
-                  className="absolute bottom-0 right-0 rounded-full bg-primary-600 p-1 text-white shadow-sm hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                >
-                  <Camera className="h-4 w-4" />
-                </button>
+            ) : (
+              <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center">
+                <span className="text-gray-500">No Logo</span>
+              </div>
+            )}
+          </div>
+
+          {/* Basic Info */}
+          <div className="w-full">
+            <div className="bg-gray-50 p-4 rounded-lg mb-4">
+              <h3 className="text-xl font-semibold text-gray-700">Company Name</h3>
+              <p className="text-gray-600">{name}</p>
+            </div>
+
+            <div className="bg-gray-50 p-4 rounded-lg mb-4">
+              <h3 className="text-xl font-semibold text-gray-700">Email</h3>
+              <p className="text-gray-600">{email}</p>
+            </div>
+
+            <div className="bg-gray-50 p-4 rounded-lg mb-4">
+              <h3 className="text-xl font-semibold text-gray-700">TIN</h3>
+              <p className="text-gray-600">{company?.tin ?? "N/A"}</p>
+            </div>
+
+            {/* Location Info */}
+            <div className="bg-gray-50 p-4 rounded-lg mb-4">
+              <h3 className="text-xl font-semibold text-gray-700 mb-4">Location</h3>
+              {company?.location && company.location.length > 0 ? (
+                company.location.map((loc, index) => (
+                  <div key={index} className="border rounded p-4 mb-4 bg-white shadow-sm">
+                    <p className="text-gray-700"><strong>Province:</strong> {loc.province}</p>
+                    <p className="text-gray-700"><strong>District:</strong> {loc.district}</p>
+                    <p className="text-gray-700"><strong>Sector:</strong> {loc.sector}</p>
+                    <p className="text-gray-700"><strong>Cell:</strong> {loc.cell}</p>
+                    <p className="text-gray-700"><strong>Village:</strong> {loc.village}</p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-600">No locations available.</p>
               )}
             </div>
-          </div>
-        </div>
 
-        <div className="pt-16 pb-6 px-6">
-          <div className="flex justify-between items-start">
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">{formData.name}</h2>
-              <p className="text-sm text-gray-500">{formData.industry}</p>
+            {/* Change Password Button */}
+            <div className="mt-6">
+              <button
+                onClick={() => setShowPasswordModal(true)}
+                className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-300"
+              >
+                Change Password
+              </button>
             </div>
-            {!isEditing ? (
-              <Button variant="outline" onClick={() => setIsEditing(true)}>
-                Edit Profile
-              </Button>
-            ) : (
-              <div className="space-x-2">
-                <Button variant="outline" onClick={() => setIsEditing(false)}>
-                  Cancel
-                </Button>
-                <Button variant="primary" onClick={handleSubmit}>
-                  Save Changes
-                </Button>
-              </div>
-            )}
-          </div>
-
-          <div className="mt-6">
-            {isEditing ? (
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                  <Input
-                    label="Company Name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    leftIcon={<Building2 size={18} />}
-                  />
-                  <Input
-                    label="Industry"
-                    name="industry"
-                    value={formData.industry}
-                    onChange={handleChange}
-                    leftIcon={<Building2 size={18} />}
-                  />
-                  <Input
-                    label="Email Address"
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    leftIcon={<Mail size={18} />}
-                  />
-                  <Input
-                    label="Phone Number"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    leftIcon={<Phone size={18} />}
-                  />
-                  <Input
-                    label="Location"
-                    name="location"
-                    value={formData.location}
-                    onChange={handleChange}
-                    leftIcon={<MapPin size={18} />}
-                  />
-                </div>
-                <div>
-                  <label htmlFor="about" className="block text-sm font-medium text-gray-700">
-                    About
-                  </label>
-                  <textarea
-                    id="about"
-                    name="about"
-                    rows={4}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
-                    value={formData.about}
-                    onChange={handleChange}
-                  />
-                </div>
-              </form>
-            ) : (
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                  <div className="flex items-center text-sm text-gray-500">
-                    <Mail className="mr-2 h-5 w-5 text-gray-400" />
-                    {formData.email}
-                  </div>
-                  <div className="flex items-center text-sm text-gray-500">
-                    <Phone className="mr-2 h-5 w-5 text-gray-400" />
-                    {formData.phone}
-                  </div>
-                  <div className="flex items-center text-sm text-gray-500">
-                    <MapPin className="mr-2 h-5 w-5 text-gray-400" />
-                    {formData.location}
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-gray-700">About</h3>
-                  <p className="mt-1 text-sm text-gray-500">{formData.about}</p>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
 
-      {/* Security Section */}
-      <div className="mt-8 bg-white shadow rounded-lg overflow-hidden">
-        <div className="px-6 py-5 border-b border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900">Security</h3>
-        </div>
-        <div className="px-6 py-5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <Lock className="h-5 w-5 text-gray-400 mr-2" />
-              <div>
-                <h4 className="text-sm font-medium text-gray-900">Password</h4>
-                <p className="text-sm text-gray-500">Last changed 2 months ago</p>
-              </div>
-            </div>
-            <Button variant="outline" size="sm">
-              Change Password
-            </Button>
-          </div>
-          <div className="mt-6">
-            <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700 border-red-200 hover:border-red-300">
-              Logout
-            </Button>
-          </div>
-        </div>
-      </div>
+      {showPasswordModal && (
+        <CompanyChangePasswordModal onClose={() => setShowPasswordModal(false)} />
+      )}
     </div>
   );
-};
-
-export default CompanyProfile;
+}

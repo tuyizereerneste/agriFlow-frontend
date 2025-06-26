@@ -38,7 +38,7 @@ const ImageCaptureModal = ({ isOpen, onClose, onCapture }: ImageCaptureModalProp
       left: 0,
       width: '100%',
       height: '100%',
-      backgroundColor: 'rgba(0, 0, 0, 0.7)', // Slightly darker background for better contrast
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
@@ -50,7 +50,7 @@ const ImageCaptureModal = ({ isOpen, onClose, onCapture }: ImageCaptureModalProp
         borderRadius: '10px',
         width: '90%',
         maxWidth: '500px',
-        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)' // Adding a subtle shadow
+        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
       }}>
         <Webcam
           audio={false}
@@ -59,8 +59,8 @@ const ImageCaptureModal = ({ isOpen, onClose, onCapture }: ImageCaptureModalProp
           videoConstraints={videoConstraints}
           style={{
             width: '100%',
-            borderRadius: '5px', // Rounded corners for the webcam feed
-            marginBottom: '15px' // Space between webcam and buttons
+            borderRadius: '5px',
+            marginBottom: '15px'
           }}
         />
         <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -68,7 +68,7 @@ const ImageCaptureModal = ({ isOpen, onClose, onCapture }: ImageCaptureModalProp
             type="button"
             onClick={capture}
             style={{
-              backgroundColor: '#3b82f6', // Blue background
+              backgroundColor: '#3b82f6',
               color: 'white',
               border: 'none',
               borderRadius: '4px',
@@ -78,7 +78,7 @@ const ImageCaptureModal = ({ isOpen, onClose, onCapture }: ImageCaptureModalProp
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              marginRight: '10px' // Space between buttons
+              marginRight: '10px'
             }}
           >
             <span style={{ marginRight: '8px' }}>📷</span> Capture Image
@@ -86,7 +86,7 @@ const ImageCaptureModal = ({ isOpen, onClose, onCapture }: ImageCaptureModalProp
           <button
             onClick={onClose}
             style={{
-              backgroundColor: '#6b7280', // Gray background
+              backgroundColor: '#6b7280',
               color: 'white',
               border: 'none',
               borderRadius: '4px',

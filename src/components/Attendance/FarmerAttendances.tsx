@@ -144,7 +144,7 @@ const FarmerAttendances: React.FC = () => {
 
                     <div className="mt-3 grid grid-cols-2 gap-2">
                       {record.photos.map((photo, idx) => {
-                        const photoUrl = `http://localhost:5000/api/uploads/attendance/${photo}`;
+                        const photoUrl = `http://localhost:5000/uploads/attendance/${photo}`;
                         return (
                           <div key={idx} className="relative group cursor-pointer">
                             <img

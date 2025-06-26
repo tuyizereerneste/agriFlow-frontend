@@ -119,7 +119,7 @@ useEffect(() => {
       {/* Quick Links - Moved to the top */}
       <div className="mb-8">
         <h2 className="text-lg font-medium text-gray-900 mb-4">Quick Links</h2>
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {/*<div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {[
             { name: 'Add New Farmer', to: '/create-farmer-form', color: 'bg-green-50 text-green-700' },
             { name: 'New Data Entry', to: '/data-collection/new', color: 'bg-blue-50 text-blue-700' },
@@ -138,7 +138,7 @@ useEffect(() => {
               {link.name}
             </a>
           ))}
-        </div>
+        </div>*/}
       </div>
       
       {/* Stats */}

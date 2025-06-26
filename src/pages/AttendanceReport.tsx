@@ -275,7 +275,7 @@ export default function AttendanceReports() {
       } else {
         setSearchResults([]);
       }
-    }, 300); // debounce
+    }, 300);
   
     return () => clearTimeout(delayDebounce);
   }, [searchQuery]);
@@ -384,16 +384,12 @@ export default function AttendanceReports() {
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet([]);
   
-    // Add project details to the worksheet
     XLSX.utils.sheet_add_aoa(ws, projectDetails, { origin: "A1" });
   
-    // Determine the start row for the headers
     const startRow = projectDetails.length + 2;
-  
-    // Add headers to the worksheet
+
     XLSX.utils.sheet_add_aoa(ws, [headers], { origin: `A${startRow}` });
   
-    // Style the headers
     headers.forEach((_, colIdx) => {
       const cell = ws[XLSX.utils.encode_cell({ r: startRow - 1, c: colIdx })];
       if (cell) {
@@ -404,10 +400,8 @@ export default function AttendanceReports() {
       }
     });
   
-    // Add attendance data to the worksheet
     XLSX.utils.sheet_add_aoa(ws, attendanceRows, { origin: `A${startRow + 1}` });
   
-    // Auto column widths
     const allRows = [headers, ...attendanceRows];
     const colWidths = headers.map((_, i) => {
       const maxLength = allRows.reduce((acc, row) => {
@@ -419,10 +413,8 @@ export default function AttendanceReports() {
     });
     ws["!cols"] = colWidths;
   
-    // Add the worksheet to the workbook
     XLSX.utils.book_append_sheet(wb, ws, "Attendance");
   
-    // Write the workbook to a file
     XLSX.writeFile(wb, "attendance-records.xlsx");
   };
   
@@ -434,11 +426,11 @@ export default function AttendanceReports() {
   
     const doc = new jsPDF('landscape');
   
-    // ✅ Optional: Company logo space
+    // Optional: Company logo space
     doc.setFontSize(10);
     doc.text("Company Logo", 14, 10);
   
-    // ✅ Project & Activity Details
+    // Project & Activity Details
     const projectDetails = [
       ["Project Title", selectedProj.title],
       ["Description", selectedProj.description],
@@ -462,14 +454,13 @@ export default function AttendanceReports() {
       doc.text(value, 60, 30 + index * 6, { maxWidth: 120 });
     });
   
-    // ✅ Table headers
+    // Table headers
     const headers = [
       "Farmer Number", "Name", "Gender", "Date of Birth", "Phones",
       "Province", "District", "Sector", "Cell", "Village",
       "Attended At", "Notes"
     ];
   
-    // ✅ Table data
     const data = filteredAttendanceRecords.map((record) => {
       const location = record.location?.[0] ?? {};
       return [
@@ -490,7 +481,6 @@ export default function AttendanceReports() {
   
     const tableStartY = 30 + projectDetails.length * 6 + 10;
   
-    // ✅ Use autoTable to render the table (handles wrapping, layout, page break)
     autoTable(doc, {
       head: [headers],
       body: data,
