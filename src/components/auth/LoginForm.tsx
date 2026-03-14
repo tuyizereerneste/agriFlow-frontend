@@ -63,7 +63,7 @@ const LoginForm: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post<LoginResponse>('https://agriflow-backend-cw6m.onrender.com/api/auth/login', formData);
+      const response = await axios.post<LoginResponse>('http://localhost:5000/api/auth/login', formData);
       const { token } = response.data;
       localStorage.setItem('token', token);
 
@@ -71,16 +71,16 @@ const LoginForm: React.FC = () => {
       console.log('Decoded token:', decoded);
 
       if (decoded.role === 'Admin') {
-        console.log('Navigating to /admin/dashboard'); // Debugging line
+        console.log('Navigating to /admin/dashboard');
         navigate('/admin/dashboard');
       } else if (decoded.type === 'company') {
-        console.log('Navigating to /company/overview'); // Debugging line
+        console.log('Navigating to /company/overview');
         navigate('/company/overview');
       } else if (decoded.role === 'Volunteer') {
-        console.log('Navigating to /volunteer'); // Debugging line
+        console.log('Navigating to /volunteer');
         navigate('/volunteer');
       } else {
-        console.log('Navigating to /login'); // Debugging line
+        console.log('Navigating to /login');
         navigate('/login');
       }
     } catch (error: any) {

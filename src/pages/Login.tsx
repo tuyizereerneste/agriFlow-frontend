@@ -27,7 +27,7 @@ const Login: React.FC = () => {
       
       <div className="mt-8 text-center">
         <p className="text-xs text-gray-500">
-          &copy; 2025 AgriFlow. All rights reserved.
+          &copy; 2026 AgriFlow. All rights reserved.
         </p>
       </div>
     </div>

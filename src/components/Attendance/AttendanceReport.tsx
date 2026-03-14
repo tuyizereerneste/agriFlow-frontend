@@ -85,15 +85,39 @@ interface Farmer {
 }
 
 interface AttendanceRecord extends Farmer {
-  activityId: string;
-  attendedAt: string;
-  notes: string;
-  photos: string[];
+  attendanceId: string
+  notes: string
+  photos: string[]
+  createdAt: string
+  createdBy?: {
+    id: string
+    name: string
+    email: string
+    role: string
+  } | null
 }
 
 interface ApiResponse {
   message: string;
   data: Project[];
+}
+interface AttendanceApiResponse {
+  project: {
+    id: string
+    title: string
+  }
+
+  practice: {
+    id: string
+    title: string
+  }
+
+  activity: {
+    id: string
+    title: string
+  }
+
+  farmers: AttendanceRecord[]
 }
 
 export default function AttendanceReports() {
@@ -121,7 +145,7 @@ export default function AttendanceReports() {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get<{ message: string; data: Company[] }>(
-          `https://agriflow-backend-cw6m.onrender.com/api/company/all`,
+          `http://localhost:5000/api/company/all`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -151,7 +175,7 @@ export default function AttendanceReports() {
           const userId = selectedCompany.userId;
           const token = localStorage.getItem("token");
           const response = await axios.get<ApiResponse>(
-            `https://agriflow-backend-cw6m.onrender.com/api/project/get-company-projects/${userId}`,
+            `http://localhost:5000/api/project/get-company-projects/${userId}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -178,7 +202,7 @@ export default function AttendanceReports() {
         try {
           const token = localStorage.getItem("token");
           const response = await axios.get<{ message: string; data: TargetPractice[] }>(
-            `https://agriflow-backend-cw6m.onrender.com/api/project/project-practices/${selectedProject}`,
+            `http://localhost:5000/api/project/project-practices/${selectedProject}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -205,7 +229,7 @@ export default function AttendanceReports() {
         try {
           const token = localStorage.getItem("token");
           const response = await axios.get<{ message: string; data: Activity[] }>(
-            `https://agriflow-backend-cw6m.onrender.com/api/project/practice-activities/${selectedPractice}`,
+            `http://localhost:5000/api/project/practice-activities/${selectedPractice}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -232,31 +256,26 @@ export default function AttendanceReports() {
       setIsLoading(true);
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get<{ attendance: Array<{ id: string; farmer: Farmer; activityId: string; createdAt: string; notes: string; photos: string[] }> }>(
-          `https://agriflow-backend-cw6m.onrender.com/api/project/attendance/${selectedActivity}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axios.get<AttendanceApiResponse>(
+  `http://localhost:5000/api/project/attendance/${selectedActivity}`,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
   
         // Base URL for the photos
-        const basePhotoUrl = "https://agriflow-backend-cw6m.onrender.com/uploads/attendance/";
-  
-        const records = response.data.attendance.map(att => ({
-          ...att.farmer,
-          activityId: att.activityId,
-          attendedAt: att.createdAt,
-          notes: att.notes,
-          photos: att.photos.map(photo => {
-            const photoUrl = basePhotoUrl + photo;
-            console.log(photoUrl);
-            return photoUrl;
-          }),
-        }));
-  
-        setAttendanceRecords(records);
+        const basePhotoUrl = "http://localhost:5000/uploads/attendance/";
+
+const records = response.data.farmers.map((farmer) => ({
+  ...farmer,
+  attendedAt: farmer.createdAt, // Assuming attendedAt is the same as createdAt
+  photos: farmer.photos?.map(photo => basePhotoUrl + photo) || []
+}));
+console.log("Fetched attendance records with photos:", records);
+
+setAttendanceRecords(records);
       } catch (error) {
         console.error("Error fetching attendance records:", error);
         setError("Failed to fetch attendance records");
@@ -283,7 +302,7 @@ export default function AttendanceReports() {
   const searchFarmers = async (query: string) => {
     try {
       const response = await axios.get<{ farmers: Farmer[] }>(
-        `https://agriflow-backend-cw6m.onrender.com/api/search?query=${query}`,
+        `http://localhost:5000/api/search?query=${query}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -376,7 +395,7 @@ export default function AttendanceReports() {
         location.sector || "",
         location.cell || "",
         location.village || "",
-        new Date(record.attendedAt).toLocaleDateString(),
+        new Date(record.createdAt).toLocaleDateString(),
         record.notes,
       ];
     });
@@ -474,7 +493,7 @@ export default function AttendanceReports() {
         location.sector || "",
         location.cell || "",
         location.village || "",
-        new Date(record.attendedAt).toLocaleDateString(),
+        new Date(record.createdAt).toLocaleDateString(),
         record.notes || "",
       ];
     });
@@ -705,7 +724,7 @@ export default function AttendanceReports() {
                       <td className="border px-4 py-2">{location.sector}</td>
                       <td className="border px-4 py-2">{location.cell}</td>
                       <td className="border px-4 py-2">{location.village}</td>
-                      <td className="border px-4 py-2">{new Date(record.attendedAt).toLocaleDateString()}</td>
+                      <td className="border px-4 py-2">{new Date(record.createdAt).toLocaleDateString()}</td>
                       <td className="border px-4 py-2">{record.notes}</td>
                     </tr>
 

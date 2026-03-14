@@ -219,11 +219,12 @@ const AddFarmerForm: React.FC = () => {
       ...formData,
       partner: hasPartner ? formData.partner : undefined,
     };
+    console.log("Submitting farmer data:", submitData);
 
     try {
       setLoading(true);
       const response = await axios.post(
-        'https://agriflow-backend-cw6m.onrender.com/api/farmer/create-farmer',
+        'http://localhost:5000/api/farmer/create-farmer',
         submitData,
         {
           headers: {
@@ -232,11 +233,6 @@ const AddFarmerForm: React.FC = () => {
           },
         }
       );
-
-      // alert('Farmer registered successfully!');
-      // console.log('Response:', response.data);
-
-      // Optionally, clear the form
       setFormData(initialFormData);
       setHasPartner(false);
 

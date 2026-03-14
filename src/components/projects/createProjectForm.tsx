@@ -20,7 +20,7 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({ onSuccess }) => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    userId: '',
+    ownerId: '',
     startDate: '',
     endDate: '',
     objectives: '',
@@ -49,7 +49,7 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({ onSuccess }) => {
   const fetchRegisteredCompanies = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get<{ data: Company[] }>(`https://agriflow-backend-cw6m.onrender.com/api/company/all`, {
+      const response = await axios.get<{ data: Company[] }>(`http://localhost:5000/api/company/all`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -125,7 +125,7 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({ onSuccess }) => {
 
     if (!formData.title) newErrors.title = 'Title is required';
     if (!formData.description) newErrors.description = 'Description is required';
-    if (!formData.userId) newErrors.userId = 'User ID is required';
+    if (!formData.ownerId) newErrors.ownerId = 'Owner ID is required';
     if (!formData.startDate) newErrors.startDate = 'Start date is required';
     if (!formData.endDate) newErrors.endDate = 'End date is required';
     if (formData.targetPractices.length === 0) newErrors.targetPractices = 'At least one practice is required';
@@ -149,7 +149,7 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({ onSuccess }) => {
       }
 
       const response = await axios.post<ProjectResponse>(
-        `https://agriflow-backend-cw6m.onrender.com/api/project/create-project`,
+        `http://localhost:5000/api/project/create-project`,
         formData,
         {
           headers: {
@@ -166,7 +166,7 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({ onSuccess }) => {
       setFormData({
         title: '',
         description: '',
-        userId: '',
+        ownerId: '',
         startDate: '',
         endDate: '',
         objectives: '',
@@ -184,13 +184,13 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({ onSuccess }) => {
   };
 
   const handleProjectDetailsSubmit = () => {
-    if (formData.title && formData.description && formData.userId && formData.startDate && formData.endDate) {
+    if (formData.title && formData.description && formData.ownerId && formData.startDate && formData.endDate) {
       setShowPractices(true);
     } else {
       setErrors({
         title: !formData.title ? 'Title is required' : '',
         description: !formData.description ? 'Description is required' : '',
-        userId: !formData.userId ? 'User ID is required' : '',
+        ownerId: !formData.ownerId ? 'User ID is required' : '',
         startDate: !formData.startDate ? 'Start date is required' : '',
         endDate: !formData.endDate ? 'End date is required' : '',
       });
@@ -214,10 +214,10 @@ const CreateProjectForm: React.FC<CreateProjectFormProps> = ({ onSuccess }) => {
             Project Owner
           </label>
           <select
-            id="userId"
-            name="userId"
-            value={formData.userId}
-            onChange={(e) => handleChange(e, 'userId')}
+            id="ownerId"
+            name="ownerId"
+            value={formData.ownerId}
+            onChange={(e) => handleChange(e, 'ownerId')}
             className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             required
           >
