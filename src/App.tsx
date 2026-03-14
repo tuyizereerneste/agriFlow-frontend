@@ -28,7 +28,7 @@ import CompanyActivities from './components/company/CompanyActivities';
 import CompanyReports from './components/company/CompanyReports';
 import CompanyAnalytics from './components/company/CompanyAnalytics';
 import CompanyProfile from './components/company/CompanyProfile';
-import AttendanceReports from './pages/AttendanceReport';
+import AttendanceReports from './components/Attendance/AttendanceReport';
 import AttendanceDetails from './components/Attendance/FarmerAttendanceDetails';
 import AdminAnalytics from './pages/AdminAnalytics';
 import FarmerAttendances from './components/Attendance/FarmerAttendances';
