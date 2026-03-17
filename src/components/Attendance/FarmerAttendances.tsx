@@ -62,7 +62,7 @@ const FarmerAttendances: React.FC = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get<ApiResponse>(
-          `http://localhost:5000/api/project/farmer-attendance/${farmerId}`,
+          `https://agriflow-backend-cw6m.onrender.com/api/project/farmer-attendance/${farmerId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -144,7 +144,7 @@ const FarmerAttendances: React.FC = () => {
 
                     <div className="mt-3 grid grid-cols-2 gap-2">
                       {record.photos.map((photo, idx) => {
-                        const photoUrl = `http://localhost:5000/uploads/attendance/${photo}`;
+                        const photoUrl = `https://agriflow-backend-cw6m.onrender.com/uploads/attendance/${photo}`;
                         return (
                           <div key={idx} className="relative group cursor-pointer">
                             <img

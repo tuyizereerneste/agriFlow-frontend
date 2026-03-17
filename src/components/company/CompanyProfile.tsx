@@ -41,7 +41,7 @@ export default function CompanyProfile() {
         }
 
         const response = await axios.get<CompanyProfileData>(
-          "http://localhost:5000/api/user/profile",
+          "https://agriflow-backend-cw6m.onrender.com/api/user/profile",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -77,7 +77,7 @@ export default function CompanyProfile() {
           <div className="mb-6">
             {company?.logo ? (
               <img
-                src={`http://localhost:5000/uploads/logos/${company.logo}`}
+                src={`https://agriflow-backend-cw6m.onrender.com/uploads/logos/${company.logo}`}
                 alt="Company Logo"
                 className="w-32 h-32 object-contain rounded-full border-4 border-green-100 p-2"
               />

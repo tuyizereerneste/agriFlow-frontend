@@ -26,7 +26,7 @@ const CompanyChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ onClos
       const token = localStorage.getItem("token");
 
       await axios.post(
-        "http://localhost:5000/api/user/change-password",
+        "https://agriflow-backend-cw6m.onrender.com/api/user/change-password",
         {
           currentPassword,
           newPassword,

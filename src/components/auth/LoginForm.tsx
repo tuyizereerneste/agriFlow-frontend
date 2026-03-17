@@ -63,7 +63,7 @@ const LoginForm: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post<LoginResponse>('http://localhost:5000/api/auth/login', formData);
+      const response = await axios.post<LoginResponse>('https://agriflow-backend-cw6m.onrender.com/api/auth/login', formData);
       const { token } = response.data;
       localStorage.setItem('token', token);
 
