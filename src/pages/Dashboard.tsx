@@ -80,7 +80,7 @@ useEffect(() => {
         },
         {
           id: "4",
-          name: "Enrolled Farmers",
+          name: "Enrolled Beneficiaries",
           value: data.totalEnrolledFarmers,
           change: "5%",
           trend: "up",
@@ -197,7 +197,7 @@ useEffect(() => {
           <div className="bg-white rounded-lg shadow">
             <div className="p-5">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-medium text-gray-900">Farmer Registrations</h3>
+                <h3 className="text-lg font-medium text-gray-900">Beneficiaries Registrations</h3>
                 <div className="flex items-center">
                   <span className="text-sm text-gray-500">Last 6 months</span>
                   <button className="ml-2 text-gray-400 hover:text-gray-500">

@@ -138,7 +138,7 @@ const Farmers: React.FC = () => {
     return (
       <div>
         <div className="mb-6 flex justify-between items-center">
-          <h1 className="text-2xl font-semibold">Add New Farmer</h1>
+          <h1 className="text-2xl font-semibold">Add New Beneficiary</h1>
           <Button variant="outline" onClick={() => setShowAddFarmer(false)}>Back to List</Button>
         </div>
         <AddFarmerForm />
@@ -149,8 +149,8 @@ const Farmers: React.FC = () => {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold">Farmers</h1>
-        <p className="mt-1 text-sm text-gray-500">Manage and view all registered farmers</p>
+        <h1 className="text-2xl font-semibold">Beneficiaries</h1>
+        <p className="mt-1 text-sm text-gray-500">Manage and view all registered beneficiaries</p>
       </div>
 
       {/* Search & Filters */}
@@ -159,7 +159,7 @@ const Farmers: React.FC = () => {
           <Search className="absolute left-3 top-2.5 text-gray-400" size={20} />
           <Input
             type="text"
-            placeholder="Search farmers..."
+            placeholder="Search beneficiaries..."
             className="pl-10"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -172,7 +172,7 @@ const Farmers: React.FC = () => {
           Export
         </Button>
         <Button variant="primary" leftIcon={<Plus size={16} />} onClick={() => setShowAddFarmer(true)}>
-          Add Farmer
+          Add Beneficiary
         </Button>
       </div>
 
@@ -214,7 +214,7 @@ const Farmers: React.FC = () => {
 
       {/* Farmers List */}
       {loading ? (
-        <p>Loading farmers...</p>
+        <p>Loading beneficiary...</p>
       ) : error ? (
         <p className="text-red-500">{error}</p>
       ) : (
@@ -241,7 +241,7 @@ const Farmers: React.FC = () => {
                 </li>
               ))
             ) : (
-              <p className="text-center py-6">No farmers found</p>
+              <p className="text-center py-6">No beneficiaries found</p>
             )}
           </ul>
         </div>

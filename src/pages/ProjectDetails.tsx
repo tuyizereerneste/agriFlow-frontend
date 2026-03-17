@@ -162,7 +162,7 @@ const ProjectDetails: React.FC = () => {
           onClick={() => setShowModal(true)}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
         >
-          Add Farmer to Project
+          Add Beneficiary to Project
         </button>
         <button
           onClick={() => setShowAttendanceModal(true)}
@@ -214,7 +214,7 @@ const ProjectDetails: React.FC = () => {
 
       {/* Farmer List */}
       <div className="mb-10">
-        <h2 className="text-2xl font-semibold mb-2">Registered Farmers</h2>
+        <h2 className="text-2xl font-semibold mb-2">Registered Beneficiaries</h2>
         {filteredFarmers && filteredFarmers.length > 0 ? (
           <ul className="space-y-4">
             {filteredFarmers.map(farmer => (
@@ -235,7 +235,7 @@ const ProjectDetails: React.FC = () => {
             ))}
           </ul>
         ) : (
-          <p>No matching farmers found.</p>
+          <p>No matching beneficiaries found.</p>
         )}
       </div>
 
