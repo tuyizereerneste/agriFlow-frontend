@@ -95,7 +95,7 @@ export default function CompanyReports() {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get<{ message: string; data: Company[] }>(
-          `http://localhost:5000/api/company/all`,
+          `https://agriflow-backend-cw6m.onrender.com/api/company/all`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -125,7 +125,7 @@ export default function CompanyReports() {
           const userId = selectedCompany.userId;
           const token = localStorage.getItem("token");
           const response = await axios.get<ApiResponse>(
-            `http://localhost:5000/api/project/get-company-projects/${userId}`,
+            `https://agriflow-backend-cw6m.onrender.com/api/project/get-company-projects/${userId}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -152,7 +152,7 @@ export default function CompanyReports() {
         try {
           const token = localStorage.getItem("token");
           const response = await axios.get<{ message: string; data: TargetPractice[] }>(
-            `http://localhost:5000/api/project/project-practices/${selectedProject}`,
+            `https://agriflow-backend-cw6m.onrender.com/api/project/project-practices/${selectedProject}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -180,7 +180,7 @@ export default function CompanyReports() {
         try {
           const token = localStorage.getItem("token");
           const response = await axios.get<{ message: string; data: { farmers: any[] } }>(
-            `http://localhost:5000/api/project/get-practice-farmers/${selectedPractice}`,
+            `https://agriflow-backend-cw6m.onrender.com/api/project/get-practice-farmers/${selectedPractice}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,

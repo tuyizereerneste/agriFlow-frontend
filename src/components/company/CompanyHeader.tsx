@@ -29,7 +29,7 @@ export default function CompanyHeader() {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get<UserProfile>(
-          "http://localhost:5000/api/user/profile",
+          "https://agriflow-backend-cw6m.onrender.com/api/user/profile",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -89,7 +89,7 @@ export default function CompanyHeader() {
             {/* Company Logo */}
             {profile.company?.logo ? (
               <img
-                src={`http://localhost:5000/uploads/logos/${profile.company.logo}`}
+                src={`https://agriflow-backend-cw6m.onrender.com/uploads/logos/${profile.company.logo}`}
                 alt="Company Logo"
                 className="w-8 h-8 rounded-full border object-cover"
               />

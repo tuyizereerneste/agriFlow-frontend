@@ -40,7 +40,7 @@ useEffect(() => {
     const token = localStorage.getItem("token");
 
     try {
-      const res = await axios.get("http://localhost:5000/api/project-stats", {
+      const res = await axios.get("https://agriflow-backend-cw6m.onrender.com/api/project-stats", {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,

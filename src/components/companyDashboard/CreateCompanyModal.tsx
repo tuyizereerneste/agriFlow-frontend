@@ -90,7 +90,7 @@ const CreateCompanyModal: React.FC<CreateCompanyModalProps> = ({ onClose, onComp
 
     try {
       setLoading(true);
-      await axios.post('http://localhost:5000/api/company/register-company', formDataToSend, {
+      await axios.post('https://agriflow-backend-cw6m.onrender.com/api/company/register-company', formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
