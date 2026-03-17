@@ -32,6 +32,7 @@ interface Location {
 
 interface Land {
   id: string;
+  upi: string;
   size: number;
   ownership: string;
   crops: string[];
@@ -158,9 +159,9 @@ const FarmerDetails: React.FC = () => {
   };
   
 
-  if (loading) return <p>Loading farmer details...</p>;
+  if (loading) return <p>Loading beneficiary details...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
-  if (!farmer) return <p className="text-gray-500">Farmer not found.</p>;
+  if (!farmer) return <p className="text-gray-500">Beneficiary not found.</p>;
 
   // Extract the first location from the array
   const location = farmer.location[0];
@@ -170,14 +171,14 @@ const FarmerDetails: React.FC = () => {
       <div className="mb-6 flex items-center">
         <Link to="/admin/farmers" className="flex items-center text-blue-600 hover:underline">
           <ArrowLeft className="mr-2" size={18} />
-          Back to Farmers
+          Back to Beneficiaries
         </Link>
       </div>
 
       <div className="flex flex-col sm:flex-row space-x-8 w-full max-w-4xl">
         {/* Farmer Details */}
         <div className="bg-white shadow rounded-md p-6 w-full">
-          <h1 className="text-2xl font-semibold text-center mb-4">Farmer Details</h1>
+          <h1 className="text-2xl font-semibold text-center mb-4">Beneficiary Details</h1>
 
           <div className="space-y-4">
             <div className="flex items-center space-x-4 form-field">
@@ -287,6 +288,10 @@ const FarmerDetails: React.FC = () => {
               {farmer.lands.map((land) => (
                 <div key={land.id} className="space-y-2 mt-4 border-t pt-4">
                   <div className="form-field flex items-center space-x-4">
+                    <label className="text-gray-600 font-medium">UPI:</label>
+                    <p className="text-gray-800">{land.upi}</p>
+                  </div>
+                  <div className="form-field flex items-center space-x-4">
                     <label className="text-gray-600 font-medium">Size:</label>
                     <p className="text-gray-800">{land.size} sqm</p>
                   </div>
@@ -370,7 +375,7 @@ const FarmerDetails: React.FC = () => {
             className="bg-gray-100 shadow rounded-md p-6 w-full max-w-sm"
             style={{ overflow: "visible" }}
           >
-            <h2 className="text-xl font-semibold text-center mb-4">Farmer QR Code</h2>
+            <h2 className="text-xl font-semibold text-center mb-4">Beneficiary QR Code</h2>
 
             <div className="text-center mb-4">
               <p className="text-gray-800 font-medium">{farmer.names}</p>
@@ -386,7 +391,7 @@ const FarmerDetails: React.FC = () => {
 
             <div className="text-center mt-4">
               <p className="text-gray-600 font-medium">
-                Farmer Number: {farmer.farmerNumber}
+                Beneficiary Number: {farmer.farmerNumber}
               </p>
             </div>
           </div>

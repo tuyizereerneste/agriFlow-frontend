@@ -222,7 +222,7 @@ const handleCapture = (capturedFile: File) => {
 
           {/* Farmer Search */}
           <div className="mb-4">
-            <label className="block text-gray-700">Search Farmer</label>
+            <label className="block text-gray-700">Search Beneficiary</label>
             <input
               type="text"
               className="w-full p-2 border rounded-md"

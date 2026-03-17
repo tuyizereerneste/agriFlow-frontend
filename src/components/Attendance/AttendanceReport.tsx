@@ -368,7 +368,7 @@ setAttendanceRecords(records);
     ];
   
     const headers = [
-      "Farmer Number",
+      "Beneficiary Number",
       "Name",
       "Gender",
       "Date of Birth",
@@ -475,7 +475,7 @@ setAttendanceRecords(records);
   
     // Table headers
     const headers = [
-      "Farmer Number", "Name", "Gender", "Date of Birth", "Phones",
+      "Beneficiary Number", "Name", "Gender", "Date of Birth", "Phones",
       "Province", "District", "Sector", "Cell", "Village",
       "Attended At", "Notes"
     ];
@@ -689,7 +689,7 @@ setAttendanceRecords(records);
           <table className="min-w-full border border-gray-300">
             <thead className="bg-gray-100">
               <tr>
-                <th className="border px-4 py-2 text-left">Farmer Number</th>
+                <th className="border px-4 py-2 text-left">Beneficiary Number</th>
                 <th className="border px-4 py-2 text-left">Name</th>
                 <th className="border px-4 py-2 text-left">Gender</th>
                 <th className="border px-4 py-2 text-left">Date of Birth</th>

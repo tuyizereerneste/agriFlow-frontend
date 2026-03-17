@@ -53,8 +53,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, onClose }) => {
   const location = useLocation();
 
   const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: <LayoutDashboard size={20} /> },
-    { name: 'Farmers', href: 'farmers', icon: <Users size={20} /> },
+    { name: 'Dashboard', href: '/admin/dashboard', icon: <LayoutDashboard size={20} /> },
+    { name: 'Beneficiaries', href: 'farmers', icon: <Users size={20} /> },
     { name: 'Voluteer Management', href: 'volunteer-management', icon: <FileText size={20} /> },
     { name: 'Analytics', href: 'analytics', icon: <BarChart3 size={20} /> },
     { name: 'Project Reports', href: 'reports', icon: <FileText size={20} /> },

@@ -189,7 +189,7 @@ export function AddFarmerModal({ projectId, projectTitle, onClose, onSuccess }: 
         <div className="p-6 border-b">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-semibold">Add Farmer to Project</h2>
+              <h2 className="text-xl font-semibold">Add Beneficiary to Project</h2>
               <p className="text-sm text-gray-500 mt-1">{projectTitle}</p>
             </div>
             <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
@@ -206,7 +206,7 @@ export function AddFarmerModal({ projectId, projectTitle, onClose, onSuccess }: 
                 <div className="relative">
                   <input
                     type="text"
-                    placeholder="Search farmers..."
+                    placeholder="Search beneficiaries..."
                     className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -219,7 +219,7 @@ export function AddFarmerModal({ projectId, projectTitle, onClose, onSuccess }: 
                     className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition"
                     onClick={() => navigate('/admin/create-farmer-form')}
                   >
-                    + Create New Farmer
+                    + Create New Beneficiary
                   </button>
                 </div>
               </div>
@@ -234,7 +234,7 @@ export function AddFarmerModal({ projectId, projectTitle, onClose, onSuccess }: 
                       onClick={() => setSelectedFarmer(farmer)}
                     >
                       <p className="font-medium">{farmer.names}</p>
-                      <p className="text-sm text-gray-500">Farmer Number: {farmer.farmerNumber}</p>
+                      <p className="text-sm text-gray-500">Beneficiary Number: {farmer.farmerNumber}</p>
                     </button>
                   ))}
                 </div>
@@ -245,9 +245,9 @@ export function AddFarmerModal({ projectId, projectTitle, onClose, onSuccess }: 
               {/* Selected Farmer Info */}
               <div className="flex items-center justify-between bg-gray-50 p-4 rounded-lg">
                 <div>
-                  <p className="text-sm text-gray-500">Selected Farmer</p>
+                  <p className="text-sm text-gray-500">Selected Beneficiary</p>
                   <p className="font-medium">{selectedFarmer.names}</p>
-                  <p className="text-sm text-gray-500">Farmer Number: {selectedFarmer.farmerNumber}</p>
+                  <p className="text-sm text-gray-500">Beneficiary Number: {selectedFarmer.farmerNumber}</p>
                 </div>
                 <button
                   onClick={() => setSelectedFarmer(null)}
@@ -313,7 +313,7 @@ export function AddFarmerModal({ projectId, projectTitle, onClose, onSuccess }: 
               ) : (
                 <>
                   <Plus size={18} />
-                  <span>Add Farmer</span>
+                  <span>Add Beneficiary</span>
                 </>
               )}
             </button>
